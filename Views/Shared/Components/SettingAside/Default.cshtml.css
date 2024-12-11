@@ -1,0 +1,30 @@
+﻿aside {
+    flex: 0 0 auto;
+    min-width: 150px;
+    background-color: #cfcece;
+}
+
+    aside > div.active {
+        position: relative;
+    }
+
+        aside > div.active::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0.25rem;
+            height: 100%;
+            background-color: #64f8fd;
+        }
+
+    aside > div button {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 8px;
+    }
+
+        aside > div button:hover {
+            background-color: #ddd;
+        }

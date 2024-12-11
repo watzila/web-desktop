@@ -1,0 +1,23 @@
+﻿.name {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.layout span {
+    display: inline-block;
+    color: #666666;
+    font-size: 1.05rem;
+}
+
+.headIMG {
+    width: 200px;
+    height: 200px;
+    margin: 20px 0 10px 0;
+    border-radius: 50%;
+    border: 1px solid;
+    overflow: hidden;
+}
+
+    .headIMG img {
+        object-fit: cover;
+    }

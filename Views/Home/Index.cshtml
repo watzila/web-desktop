@@ -1,0 +1,13 @@
+﻿@model List<Backstage.Models.ACLObject>
+@{
+    ViewData["Title"] = "桌面";
+}
+
+@foreach(var item in Model) {
+    <div class="wrap">
+        <button data-href="@item.ExecuteURL" data-value="@item.ID">
+            <div class="diagramed"><img src="@(item.Icon)" title="@item.Name" asp-append-version="true"></div>
+            <p>@item.Name</p>
+        </button>
+    </div>
+}

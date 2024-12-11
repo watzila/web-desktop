@@ -1,0 +1,19 @@
+﻿.weather > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+    .weather > div > div {
+        width: 2rem;
+    }
+
+        .weather > div > div img {
+            filter: drop-shadow(3px 3px 4px #ccc);
+        }
+
+    .weather > div > span {
+        margin-left: 5px;
+        font-size: 1.1rem;
+    }

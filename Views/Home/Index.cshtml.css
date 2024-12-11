@@ -1,0 +1,26 @@
+﻿.wrap {
+    display:inline-block;
+    padding: 10px;
+}
+
+    .wrap button {
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+        .wrap button:hover {
+            background-color: rgba(255,255,255,0.45);
+        }
+
+        .wrap button.click {
+            background-color: rgba(255,255,255,0.6);
+        }
+
+    .wrap .diagramed {
+        width: 50px;
+    }
+
+    .wrap button p {
+        max-height: 2rem;
+        margin-top: 2px;
+    }

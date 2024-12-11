@@ -1,0 +1,23 @@
+﻿<div class="defaultWindow" id="w">
+    <div class='resizer topLeft'></div>
+    <div class='resizer topRight'></div>
+    <div class='resizer bottomLeft'></div>
+    <div class='resizer bottomRight'></div>
+
+    <header>
+        <div class="windowIcon">
+            <img src="@TempData["iconPath"]" width="24" height="24">
+        </div>
+        <div class="title">
+            <h4>@TempData["title"]</h4>
+        </div>
+        <aside>
+            <button class="icon" title="最小化" id="smallWindow"><b>&#128469;</b></button>
+            <button class="icon" title="縮放"><b>&#128470;</b></button>
+            <button class="icon" title="關閉" id="closeWindow"><b>&#128473;</b></button>
+        </aside>
+    </header>
+    <main class="iframe">
+        @RenderBody()
+    </main>
+</div>

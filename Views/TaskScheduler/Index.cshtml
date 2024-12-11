@@ -1,0 +1,40 @@
+﻿@model List<Microsoft.Win32.TaskScheduler.Task>
+@{
+    Layout = TempData["Open"].ToString() == "_self" ? null : "~/Views/Shared/_WindowLayout.cshtml";
+}
+
+<link href="/css/table.css" rel="stylesheet" asp-append-version="true" />
+
+<div>
+    <table class="sTable">
+        <thead>
+            <tr>
+                <th>名稱</th>
+                <th>狀態</th>
+                <th>觸發程序</th>
+                <th>下次執行時間</th>
+                <th>上次執行時間</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model) {
+                <tr>
+                    <td>@t.Name</td>
+                    <td>@t.State</td>
+                    <td>@t.Definition.Triggers</td>
+                    <td>@t.NextRunTime</td>
+                    <td>@t.LastRunTime</td>
+                    <td width="100">
+                        <button class="run" value="@t.Path">執行</button>
+                        <button class="stop" value="@t.Path">停止</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<script src="~/js/taskScheduler.js" type="module" asp-append-version="true"></script>
+

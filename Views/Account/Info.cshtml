@@ -1,0 +1,16 @@
+﻿@model Backstage.Models.Users
+@{
+    Layout = null;
+}
+
+
+<div class="content">
+    @await Component.InvokeAsync("SettingAside", new { id = Model.ACLObjectID, parentId = Model.ACLObjectParentID })
+
+    <div class="layout">
+        <h2>@Model.Title</h2>
+        <div class="headIMG"><img src="@Model.ProfileIMG"></div>
+        <p class="name">@Model.Name</p>
+        <span>系統管理員</span>
+    </div>
+</div>

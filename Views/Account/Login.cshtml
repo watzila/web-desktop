@@ -1,0 +1,14 @@
+﻿@model Backstage.Models.Users
+@{
+    Layout = null;
+}
+
+
+<div class="content">
+    @await Component.InvokeAsync("SettingAside", new { id = Model.ACLObjectID, parentId = Model.ACLObjectParentID })
+
+    <div class="layout">
+        <h2>@Model.Title</h2>
+
+    </div>
+</div>

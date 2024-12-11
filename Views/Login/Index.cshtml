@@ -1,0 +1,18 @@
+﻿@model Backstage.Models.LoginParamModel
+@{
+    ViewData["Title"] = "登入";
+}
+
+@using(Html.BeginForm()) {
+    @Html.AntiForgeryToken()
+
+    <label for="account">帳號：</label>
+    @Html.TextBoxFor(model => model.Account, new { id = "account" })
+    @Html.ValidationMessageFor(model => model.Account, "")
+
+    <label for="pwd">密碼：</label>
+    @Html.Password("Password", "", new { id = "pwd", autocomplete = "off" })
+    @Html.ValidationMessageFor(model => model.Password, "")
+
+    <input type="submit" value="登入" />
+}

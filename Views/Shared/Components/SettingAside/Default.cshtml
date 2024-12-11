@@ -1,0 +1,27 @@
+﻿@model List<Backstage.Models.ACLObject>
+@{
+    Layout = null;
+}
+
+<link href="~/css/aside.css" rel="stylesheet" />
+
+<aside class="wrap">
+    @foreach (var item in Model) {
+        <div class="@(item.IsCurrent?"active":"")">
+            <button data-href="@item.ExecuteURL" data-value="@item.ID" data-click="1">
+                <div>
+                    @if (item.ParentID == null) {
+                        @Html.Raw(item.Icon)
+                    } else {
+                        <img src="@item.Icon" width="36" height="36" asp-append-version="true" />
+                    }
+                </div>
+                <div>
+                    <h4>@item.Name</h4>
+                    <span>@item.Directions</span>
+                </div>
+            </button>
+        </div>
+    }
+
+</aside>
