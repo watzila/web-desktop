@@ -5,9 +5,9 @@
 
 @foreach(var item in Model) {
     <div class="wrap">
-        <button data-href="@item.ExecuteURL" data-value="@item.ID">
-            <div class="diagramed"><img src="@(item.Icon)" title="@item.Name" asp-append-version="true"></div>
-            <p>@item.Name</p>
+        <button data-href="@item.ExecuteURL" data-value="@item.ID" data-type="@item.Type">
+            <div class="diagramed"><img src="@(item.Icon)" title="@item.Name" class="icon" asp-append-version="true"></div>
+            <p class="title">@item.Name</p>
         </button>
     </div>
 }

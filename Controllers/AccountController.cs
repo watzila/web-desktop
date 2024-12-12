@@ -23,7 +23,7 @@ namespace Backstage.Controllers {
                 string sql = "select top 1 * from ACLObject where ParentID=@ParentID and Status=1 order by Sort;";
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("ParentID", windowInfo.Id);
-                ACLObject result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
+                ACLObject? result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
                 if (result != null) {
                     var c = httpClientFactory.CreateClient();
                     c.BaseAddress = new Uri($"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host}");
@@ -50,7 +50,7 @@ namespace Backstage.Controllers {
                 string sql = "select * from ACLObject where ID=@ID and Status=1;";
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("ID", windowInfo.Id);
-                ACLObject result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
+                ACLObject? result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
                 if (result != null) {
                     data.ACLObjectID = result.ID;
                     data.ACLObjectParentID = result.ParentID;
@@ -74,7 +74,7 @@ namespace Backstage.Controllers {
                 string sql = "select * from ACLObject where ID=@ID and Status=1;";
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("ID", windowInfo.Id);
-                ACLObject result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
+                ACLObject? result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
                 if (result != null) {
                     data.ACLObjectID = result.ID;
                     data.ACLObjectParentID = result.ParentID;

@@ -81,6 +81,26 @@ namespace Backstage.Utility {
             return remoteIp?.ToString() ?? "";
         }
 
+        public string GetDefaultIcon(int type) {
+            switch (type) {
+                case 2:
+                    return "<i class=\"icofont-file-alt\"></i>";
+                default:
+                    return "<i class=\"icofont-file-file\"></i>";
+            }
+        }
+
+        public string GetTypeText(int type) {
+            switch (type) {
+                case 1:
+                    return "資料夾";
+                case 2:
+                    return "文字文件";
+                default:
+                    return "檔案";
+            }
+        }
+
         public class MimeType {
             public const string TXT = "text/plain";
             public const string XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";

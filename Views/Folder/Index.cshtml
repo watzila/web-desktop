@@ -1,3 +1,31 @@
-﻿@{
+﻿@model List<Backstage.Models.ACLObject>
+@{
     Layout = TempData["Open"].ToString() == "_self" ? null : "~/Views/Shared/_WindowLayout.cshtml";
 }
+<link href="/css/folder.css" rel="stylesheet" asp-append-version="true" />
+
+<div class="content">
+    <div class="layout">
+        <div class="table">
+            <div class="thead">
+                <span class="name">名稱</span>
+                <span class="date">修改日期</span>
+                <span class="type">類型</span>
+            </div>
+            @foreach (var t in Model) {
+                <button class="tbody" data-href="@t.ExecuteURL" data-value="@t.ID" data-type="@t.Type">
+                    <span class="name">
+                        @if (string.IsNullOrWhiteSpace(t.Icon)) {
+                            @Html.Raw(t.DefaultIcon)
+                        } else {
+                            <img src="@t.Icon" width="24" height="24" asp-append-version="true" />
+                        }
+                        @t.Name
+                    </span>
+                    <span class="date">@t.UpdateDate</span>
+                    <span class="type">@t.TypeText</span>
+                </button>
+            }
+        </div>
+    </div>
+</div>

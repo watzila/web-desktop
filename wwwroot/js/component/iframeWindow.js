@@ -65,8 +65,8 @@ class IframeWindow {
     open(target) {
         return new Promise((resolve) => {
             if (target) {
-                const title = target.querySelector("p").innerText;
-                const iconPath = target.querySelector("img").src;
+                const title = target.querySelector(".title").innerText;
+                const iconPath = target.querySelector(".icon").src;
                 const data = { title, iconPath, id: target.dataset.value, open: "_blank" };
                 Ajax.conn({
                     type: "post", url: target.dataset.href, data: data, fn: (res) => {
