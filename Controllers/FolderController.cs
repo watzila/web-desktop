@@ -20,16 +20,16 @@ namespace Backstage.Controllers {
         }
 
         [HttpPost]
-        public IActionResult Index([FromBody] WindowInfo windowInfo) {
-            TempData["title"] = windowInfo?.Title;
-            TempData["iconPath"] = windowInfo?.IconPath;
-            TempData["open"] = windowInfo.Open;
+        public IActionResult Index([FromBody] WindowInfoParamModel paramModel) {
+            TempData["title"] = paramModel?.Title;
+            TempData["iconPath"] = paramModel?.IconPath;
+            TempData["open"] = paramModel.Open;
             List<ACLObject> data = new List<ACLObject>();
 
             try {
                 string sql = "select * from ACLObject where ParentID=@ParentID and InDesktop=0 order by Sort;";
                 DynamicParameters parameters = new DynamicParameters();
-                parameters.Add("ParentID", windowInfo.Id);
+                parameters.Add("ParentID", paramModel.Id);
                 var result = dbConnection.Query<ACLObject>(sql, parameters);
                 foreach (var item in result) {
                     if (string.IsNullOrWhiteSpace(item.Icon)) {

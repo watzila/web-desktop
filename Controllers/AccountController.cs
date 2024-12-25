@@ -18,11 +18,11 @@ namespace Backstage.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult?> Index([FromBody] WindowInfo windowInfo) {
+        public async Task<IActionResult?> Index([FromBody] WindowInfoParamModel paramModel) {
             try {
                 string sql = "select top 1 * from ACLObject where ParentID=@ParentID and Status=1 order by Sort;";
                 DynamicParameters parameters = new DynamicParameters();
-                parameters.Add("ParentID", windowInfo.Id);
+                parameters.Add("ParentID", paramModel.Id);
                 ACLObject? result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
                 if (result != null) {
                     var c = httpClientFactory.CreateClient();
@@ -33,7 +33,7 @@ namespace Backstage.Controllers {
                         var data = await response.Content.ReadAsStringAsync();
                         return Content(data, "text/html");
                     }
-                    TempData["open"] = windowInfo.Open;
+                    TempData["open"] = paramModel.Open;
                 }
             } catch (Exception ex) {
                 //log.ErrorMessage = ex.ToString();
@@ -43,13 +43,13 @@ namespace Backstage.Controllers {
         }
 
         [HttpPost]
-        public IActionResult Info([FromBody] WindowInfo windowInfo) {
+        public IActionResult Info([FromBody] WindowInfoParamModel paramModel) {
             Users data = new Users();
 
             try {
                 string sql = "select * from ACLObject where ID=@ID and Status=1;";
                 DynamicParameters parameters = new DynamicParameters();
-                parameters.Add("ID", windowInfo.Id);
+                parameters.Add("ID", paramModel.Id);
                 ACLObject? result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
                 if (result != null) {
                     data.ACLObjectID = result.ID;
@@ -67,13 +67,13 @@ namespace Backstage.Controllers {
         }
 
         [HttpPost]
-        public IActionResult Login([FromBody] WindowInfo windowInfo) {
+        public IActionResult Login([FromBody] WindowInfoParamModel paramModel) {
             Users data = new Users();
 
             try {
                 string sql = "select * from ACLObject where ID=@ID and Status=1;";
                 DynamicParameters parameters = new DynamicParameters();
-                parameters.Add("ID", windowInfo.Id);
+                parameters.Add("ID", paramModel.Id);
                 ACLObject? result = dbConnection.Query<ACLObject>(sql, parameters).SingleOrDefault();
                 if (result != null) {
                     data.ACLObjectID = result.ID;

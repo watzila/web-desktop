@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controllers\4nbjrqkt.ebu~" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\css\_Layout.css" />
     <None Include="wwwroot\css\_WindowLayout.css" />
   </ItemGroup>
