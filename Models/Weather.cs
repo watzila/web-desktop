@@ -3,44 +3,45 @@
         public Records records { get; set; }
 
         public class Records {
-            public List<Locations> locations { get; set; }
+            public List<Locations> Locations { get; set; }
         }
 
         public class Locations {
-            public string datasetDescription { get; set; }
-            public string locationsName { get; set; }
-            public string dataid { get; set; }
-            public List<Location> location { get; set; }
+            public string DatasetDescription { get; set; }
+            public string LocationsName { get; set; }
+            public string Dataid { get; set; }
+            public List<Location> Location { get; set; }
         }
 
         public class Location {
-            public string locationName { get; set; }
-            public string geocode { get; set; }
-            public string lat { get; set; }
-            public string lon { get; set; }
-            public List<Weatherelement> weatherElement { get; set; }
+            public string LocationName { get; set; }
+            public string Geocode { get; set; }
+            public string Latitude { get; set; }
+            public string Longitude { get; set; }
+            public List<Weatherelement> WeatherElement { get; set; }
         }
 
         public class Weatherelement {
-            public string elementName { get; set; }
-            public string description { get; set; }
-            public List<Time> time { get; set; }
+            public string ElementName { get; set; }
+            public List<Time> Time { get; set; }
         }
 
         public class Time {
-            public DateTime startTime { get; set; }
-            public DateTime endTime { get; set; }
-            public List<Elementvalue> elementValue { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
+            public List<Elementvalue> ElementValue { get; set; }
         }
 
         public class Elementvalue {
-            public string value { get; set; }
-            public string measures { get; set; }
+            public string? Temperature { get; set; }//平均溫度
+            public string? Weather { get; set; }//天氣現象
+            public string? WeatherCode { get; set; }//天氣現象
         }
 
         public class DeskTopTool {
             public string Temperature { get; set; }
             public string WeatherIMG { get; set; }
+            public string Weather { get; set; }
         }
     }
 }

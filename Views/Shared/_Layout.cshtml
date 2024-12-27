@@ -23,7 +23,7 @@
             @await Component.InvokeAsync("Weather", new { locationId = "F-D0047-075", locationName = "太平區" })
         </div>
 
-        <div class="working dateTime" id="dateTime">
+        <div class="working dateTime noUserSelect" id="dateTime">
             <span><i>上午</i><time>00:00</time></span>
             <span>2023/01/01</span>
         </div>
@@ -39,7 +39,7 @@
                 <img src="https://picsum.photos/300/180">
             </div>
 
-            <div class="calendarWrap">
+            <div class="calendarWrap noUserSelect">
                 <section class="calendarBody">
                     <header>
                         <button id="previous">&lt;</button>

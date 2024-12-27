@@ -1,5 +1,5 @@
 ﻿@model Backstage.Models.Weather.DeskTopTool
-<div>
+<div title="@Model.Weather">
     <div><img src="@(Model.WeatherIMG)" asp-append-version="true" /></div>
-    <span>@Model.Temperature</span>
+    <span class="noUserSelect">@Model.Temperature</span>
 </div>
