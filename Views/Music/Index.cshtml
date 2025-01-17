@@ -1,0 +1,17 @@
+﻿@{
+    Layout = TempData["Open"].ToString() == "_self" ? null : "~/Views/Shared/_WindowLayout.cshtml";
+}
+
+<div>
+
+    <section class="wrap">
+        <div id="yt"></div>
+        <div id="controlsWrap">
+            <button id="playBTN">播放</button>
+            <button id="next">下一首</button>
+            <button id="prev">上一首</button>
+            <button id="muteBtn">靜音</button>
+            <input type="range" min="0" max="100" id="volumeSlider">
+        </div>
+    </section>
+</div>

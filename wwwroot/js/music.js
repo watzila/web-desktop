@@ -1,11 +1,12 @@
-﻿class Music {
-    constructor(obj) {
-        this.volumeBTN = obj.target.getElementById(obj.volumeBTN);
-        this.playBTN = obj.target.getElementById(obj.playBTN);
-        this.pauseBTN = obj.target.getElementById(obj.pauseBTN);
-        this.muteBTN = obj.target.getElementById(obj.muteBTN);
+﻿
+class Music {
+    constructor(ele) {
+        this.volumeSlider = ele.getElementById("volumeSlider");
+        this.playBTN = ele.getElementById("playBTN");
+        this.muteBTN = ele.getElementById("muteBtn");
         this.player;
-        this.musicUrl = [];
+        this.playStatus = false;
+        this.musicUrl = ['xyltN9Io8Hk'];
 
         this.init();
     }
@@ -16,20 +17,35 @@
             width: '0',
             videoId: this.musicUrl[0], // 替換為你想播放的影片 ID
             playerVars: {
-                autoplay: 1,
                 controls: 0
             }
         });
 
+        this.addEvent();
         console.log(this.player);
     }
 
-    play() {
-        this.player.videoId = "";
+    play(id) {
+        this.player.loadVideoById(id);
     }
 
     addEvent() {
-
+        this.playBTN.onclick = () => {
+            if (this.playStatus) {
+                this.playStatus = false;
+                this.player.pauseVideo();
+            } else {
+                this.playStatus = true;
+                this.player.playVideo();
+            }
+        };
+        this.muteBTN.onclick = () => {
+            this.player.isMuted() ? this.player.unMute() : this.player.mute();
+        };
+        this.volumeSlider.oninput = (e) => {
+            this.player.setVolume(e.target.value);
+        };
     }
 
 }
+
