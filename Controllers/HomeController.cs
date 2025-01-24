@@ -15,9 +15,9 @@ namespace Backstage.Controllers {
         }
 
         public IActionResult Index() {
-            string sql = "select * from ACLObject where Status=1 and InDesktop=1;";
+            string sql = "select * from ACLObject where Status=1 and InDesktop=1 order by Sort;";
             var data = dbConnection.Query<ACLObject>(sql).ToList();
-            data.ForEach(a => a.Icon = $"~/images/Icon/{a.Icon}");
+            data.ForEach(a => a.Icon = string.IsNullOrWhiteSpace(a.Icon)? "https://placehold.jp/50x50.png" : $"~/images/Icon/{a.Icon}");
 
             return View(data);
         }
