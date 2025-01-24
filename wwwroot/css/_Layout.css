@@ -39,7 +39,6 @@ button.working:before {
 }
 
 .fillScreen {
-    position: relative;
     display: flex;
     width: 100%;
     max-width: 100%;

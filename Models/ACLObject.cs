@@ -6,7 +6,7 @@
         public string? Directions { get; set; }
         public string? ExecuteURL { get; set; }//執行地址
         public int Type { get; set; }//類型
-        public string TypeText { get; set; }//類型
+        public string? TypeText { get; set; }//類型
         public string? Icon { get; set; }//圖標
         public string? DefaultIcon { get; set; }//預設圖標
         public bool Status { get; set; }//狀態

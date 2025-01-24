@@ -1,6 +1,5 @@
 ﻿import Notification from "./component/notification.js";
 import IframeWindow from "./component/iframeWindow.js";
-import eventBus from "./component/eventBus.js";
 
 class Desktop {
     constructor() {
@@ -14,7 +13,7 @@ class Desktop {
         this.nowDate;
         this.hr12Name;
         this.nowTime;
-        this.iframeWindow = new IframeWindow();
+        this.iframeWindow = new IframeWindow({ desktop: this.desktop, work: this.work });
         this.notificationEvent = new Notification();
         this.calendarEvent = new Calendar({
             yearText: "#year",
@@ -46,20 +45,11 @@ class Desktop {
             }
         });
 
-        eventBus.on("error", (error) => {
-            try {
-                const info = JSON.parse(error);
-                this.notificationEvent.push(info);
-            } catch (ex){
-                alert(ex);
-            }
-        });
-
         for (const item of this.wraps) {
-            this.iframeWindow.init(item.firstElementChild, this.desktop, this.work);
+            this.iframeWindow.init(item.firstElementChild);
         }
 
-        console.log(this.notificationEvent);
+        console.log(this.iframeWindow);
     }
 
     /**更新時間 */

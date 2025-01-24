@@ -1,9 +1,33 @@
-﻿class Notification {
+﻿import eventBus from "./eventBus.js";
+
+class Notification {
     constructor() {
         this.infoWrap = document.getElementById("infoWrap");
 
         this.infoWrap.addEventListener("click", (e) => {
             e.stopPropagation();
+        });
+
+        this.init();
+    }
+
+    init() {
+        eventBus.on("info", (error) => {
+            try {
+                const info = JSON.parse(error);
+                this.push(info);
+            } catch (ex) {
+                alert(ex);
+            }
+        });
+
+        eventBus.on("error", (error) => {
+            try {
+                const info = JSON.parse(error);
+                this.push(info);
+            } catch (ex) {
+                alert(ex);
+            }
         });
     }
 

@@ -2,19 +2,17 @@
 import eventBus from "../component/eventBus.js";
 
 class IframeWindow {
-    constructor() {
+    constructor(set) {
+        let { desktop, work } = set;
         this.currentClick;
         this.currentWindow;
         this.allWindows = [];
         this.zIndex = 1;
-        this.desktop;
-        this.work;
-    }
-
-    init(target, desktop, work) {
         this.desktop = desktop;
         this.work = work;
+    }
 
+    init(target) {
         target.onclick = (e) => {
             e.stopPropagation();
             e.preventDefault();
