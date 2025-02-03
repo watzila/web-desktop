@@ -17,7 +17,8 @@ class Notification {
                 const info = JSON.parse(error);
                 this.push(info);
             } catch (ex) {
-                alert(ex);
+                this.push({ title: "系統錯誤", msg: ex });
+                //console.error(ex);
             }
         });
 
@@ -26,7 +27,8 @@ class Notification {
                 const info = JSON.parse(error);
                 this.push(info);
             } catch (ex) {
-                alert(ex);
+                this.push({ title: "系統錯誤", msg: ex });
+                //console.error(ex);
             }
         });
     }
