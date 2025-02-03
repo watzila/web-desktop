@@ -1,5 +1,6 @@
-﻿import Ajax from "../component/ajax.js";
-import eventBus from "../component/eventBus.js";
+﻿import Ajax from "./ajax.js";
+import ClassRegistry from "../classRegistry.js";
+import eventBus from "./eventBus.js";
 
 class IframeWindow {
     constructor(set) {
@@ -75,11 +76,18 @@ class IframeWindow {
                             } catch {
                                 const randomId = crypto.getRandomValues(new Uint32Array(1))[0];
                                 let frag = document.createRange().createContextualFragment(res);
-                                //console.log(res,frag.firstChild);
+                                const mainJS = frag.firstChild.dataset.class;
+                                //console.log(res, frag.firstChild);
                                 frag.firstChild.id = "f" + randomId;
                                 frag.firstChild.style.top = 15 + Math.random() * 2 - 1 + "%";
                                 frag.firstChild.style.left = 10 + Math.random() * 2 - 1 + "%";
                                 this.desktop.appendChild(frag.firstChild);
+
+                                ClassRegistry.loadClass(mainJS).then(m => {
+                                    if (m) {
+                                        console.log(new m("f" + randomId));
+                                    }
+                                }).catch(error => eventBus.emit("error", error.message));
 
                                 const windowEle = document.querySelector("#f" + randomId);
                                 let frag2 = document.createRange().createContextualFragment(`<button class="working" id="f${randomId}BTN"><img src="${windowEle.querySelector(".windowIcon>img").src}" /></button>`);

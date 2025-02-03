@@ -1,16 +1,16 @@
 ﻿import Ajax from "./component/ajax.js";
 
 class TaskScheduler {
-    constructor() {
-        this.runEles;
+    constructor(id) {
+        this.iframeId = id;
         this.init();
     }
 
     init() {
-        this.runEles = document.querySelectorAll(".run");
-        this.stopEles = document.querySelectorAll(".stop");
+        let runEles = document.querySelectorAll(`#${this.iframeId} .run`);
+        let stopEles = document.querySelectorAll(`#${this.iframeId} .stop`);
 
-        this.runEles.forEach((v, k) => {
+        runEles.forEach((v, k) => {
             v.onclick = () => {
                 Ajax.conn({
                     type: "get", url: "/TaskScheduler/Run?path=" + encodeURI(v.value)
@@ -18,7 +18,7 @@ class TaskScheduler {
             };
         });
 
-        this.stopEles.forEach((v, k) => {
+        stopEles.forEach((v, k) => {
             v.onclick = () => {
                 Ajax.conn({
                     type: "get", url: "/TaskScheduler/Stop?path=" + encodeURI(v.value)
@@ -29,4 +29,4 @@ class TaskScheduler {
 
 }
 
-new TaskScheduler();
+export default TaskScheduler;

@@ -26,7 +26,7 @@ namespace Backstage.ViewComponents {
                             ) a order by a.ParentID,a.Sort;";
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("ParentID", parentId);
-                var result = dbConnection.Query<ACLObject>(sql, parameters);
+                var result = await dbConnection.QueryAsync<ACLObject>(sql, parameters);
                 foreach (var item in result) {
                     if (item.ParentID == null) {
                         item.Icon = "<i class=\"icofont-home\"></i>";

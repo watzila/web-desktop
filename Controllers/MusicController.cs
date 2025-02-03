@@ -13,9 +13,10 @@ namespace Backstage.Controllers {
 
         [HttpPost]
         public IActionResult Index([FromBody] WindowInfoParamModel paramModel) {
-            TempData["title"] = paramModel?.Title;
-            TempData["iconPath"] = paramModel?.IconPath;
+            TempData["title"] = paramModel.Title;
+            TempData["iconPath"] = paramModel.IconPath;
             TempData["open"] = paramModel.Open;
+            TempData["js"] = "Music";
 
             return View();
         }
