@@ -36,6 +36,12 @@ class IframeWindow {
                 this.clickable(windowEle);
 
                 this.go(windowEle);
+
+                ClassRegistry.loadClass(windowEle.dataset.class).then(m => {
+                    if (m) {
+                        console.log(new m(windowEle.id));
+                    }
+                }).catch(error => eventBus.emit("error", error.message));
             });
         };
 
@@ -76,18 +82,11 @@ class IframeWindow {
                             } catch {
                                 const randomId = crypto.getRandomValues(new Uint32Array(1))[0];
                                 let frag = document.createRange().createContextualFragment(res);
-                                const mainJS = frag.firstChild.dataset.class;
                                 //console.log(res, frag.firstChild);
                                 frag.firstChild.id = "f" + randomId;
                                 frag.firstChild.style.top = 15 + Math.random() * 2 - 1 + "%";
                                 frag.firstChild.style.left = 10 + Math.random() * 2 - 1 + "%";
                                 this.desktop.appendChild(frag.firstChild);
-
-                                ClassRegistry.loadClass(mainJS).then(m => {
-                                    if (m) {
-                                        console.log(new m("f" + randomId));
-                                    }
-                                }).catch(error => eventBus.emit("error", error.message));
 
                                 const windowEle = document.querySelector("#f" + randomId);
                                 let frag2 = document.createRange().createContextualFragment(`<button class="working" id="f${randomId}BTN"><img src="${windowEle.querySelector(".windowIcon>img").src}" /></button>`);
@@ -106,6 +105,7 @@ class IframeWindow {
                                 this.workingChoose("f" + randomId + "BTN");
                                 this.clickBTNable(windowEle);
                                 console.log(this.allWindows);
+                                
                                 resolve(windowEle);
                             }
                         }

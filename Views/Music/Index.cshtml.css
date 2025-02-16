@@ -1,0 +1,115 @@
+﻿.displayWrap {
+    width: 100%;
+    height: 80%;
+}
+
+.ytVideoIMG {
+    height: 100%;
+    border: 1px solid;
+    overflow: hidden;
+    text-align: center;
+    background-color: #000;
+}
+
+    .ytVideoIMG img {
+        object-fit: contain;
+    }
+
+.timeWrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.controlWrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+
+    .controlWrap .videoTitle {
+        flex: 1 1 40%;
+        max-width: 40%;
+        text-wrap: nowrap;
+        overflow: hidden;
+    }
+
+.videoTitle > div {
+    display: inline-block;
+}
+
+.videoTitle h3 {
+    animation: run 10s linear 5s forwards, run2 20s linear 15s infinite;
+}
+
+@keyframes run {
+    from {
+        transform: translateX(0%);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes run2 {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.controlWrap .middleWrap {
+    flex: 0 0 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1%;
+}
+
+.playBTN {
+    font-size: 1.6rem;
+}
+
+.prevBTN,
+.nextBTN,
+.muteBTN {
+    font-size: 1.15rem;
+}
+
+.timeSlider {
+    width: 100%;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.rightWrap {
+    flex: 1 1 40%;
+    text-align: end;
+}
+
+.volumeControl {
+    position: relative;
+    display: inline-block;
+}
+
+    .volumeControl:hover .volumeSlider {
+        display: inline-block;
+    }
+
+.volumeSlider {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    right: -65px;
+    width: 80px;
+    height: 6px;
+    transform-origin: center left;
+    transform: rotate(-90deg);
+}
