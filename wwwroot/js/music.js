@@ -3,15 +3,17 @@
         this.iframe = document.getElementById(id);
         this.volumeSlider = this.iframe.querySelector(".volumeSlider");
         this.playBTN = this.iframe.querySelector(".playBTN");
-        this.muteBTN = this.iframe.querySelector(".muteBtn");
-        this.videoTitle = this.iframe.querySelector(".videoTitle");
+        this.muteBTN = this.iframe.querySelector(".muteBTN");
+        this.videoTitle = this.iframe.querySelector(".videoTitle h3");
+        this.videoIMG = this.iframe.querySelector(".ytVideoIMG>img");
         this.timeSlider = this.iframe.querySelector(".timeSlider");
-        this.timeText = this.iframe.querySelector(".timeText");
+        this.currentTimeText = this.iframe.querySelector(".currentTimeText");
+        this.totalTimeText = this.iframe.querySelector(".totalTimeText");
         this.player;
         this.playStatus = false;
         this.musicUrl = ['5aH-Uw_-Tmc'];
         this.duration = 0;//影片總時長（秒）
-        this.durationText = "0:00";
+        this.durationText = "00:00";
         this.currentTime = 0;
         this.updateInterval;
 
@@ -19,15 +21,17 @@
     }
 
     init() {
-        const yt = this.iframe.querySelector(".yt");
-        this.player = new YT.Player(yt, {
+        const youtubeIframe = this.iframe.querySelector(".yt");
+        this.player = new YT.Player(youtubeIframe, {
             height: '200',
             width: '200',
             videoId: this.musicUrl[0],
             playerVars: {
+                modestbranding: 1,
+                disablekb: 1,
                 enablejsapi: 1, // 啟用 API 控制
-                autoplay: 0,
-                controls: 0
+                controls: 0,
+                referrerpolicy: "origin",
             },
             events: {
                 "onReady": (e) => this.onPlayerReady(e),
@@ -42,28 +46,40 @@
         this.player.loadVideoById(id);
     }
 
+    getIMG(id,num=0) {
+        return `https://img.youtube.com/vi/${id}/${num}.jpg`;
+    }
+
     onPlayerReady(e) {
         this.videoTitle.innerText = this.player.videoTitle;
         this.volumeSlider.value = this.player.getVolume();
         this.duration = this.player.getDuration();
         this.timeSlider.max = this.duration;
         this.durationText = this.formatTime(this.duration);
-        this.timeText.innerText = `0:00/${this.durationText}`;
+        this.totalTimeText.innerText = this.durationText;
+        this.videoIMG.src = this.getIMG(this.musicUrl[0]);
 
         this.playBTN.onclick = () => {
             if (this.playStatus) {
                 this.playStatus = false;
-                this.playBTN.innerText = "播放";
+                this.playBTN.innerText = "▶️";
                 this.player.pauseVideo();
             } else {
                 this.playStatus = true;
-                this.playBTN.innerText = "暫停";
+                this.playBTN.innerText = "⏸️";
                 this.player.seekTo(this.currentTime, true);
+                this.player.playVideo();
             }
         };
 
         this.muteBTN.onclick = () => {
-            this.player.isMuted() ? this.player.unMute() : this.player.mute();
+            if (this.player.isMuted()) {
+                this.player.unMute();
+                this.muteBTN.innerText = "🔊"; // 音量圖示
+            } else {
+                this.player.mute();
+                this.muteBTN.innerText = "🔇"; // 靜音圖示
+            }
         };
 
         this.volumeSlider.oninput = (e) => {
@@ -75,7 +91,7 @@
 
             e.target.onmouseup = () => {
                 this.currentTime = e.target.value;
-                this.timeText.innerText = this.formatTime(e.target.value) + "/" + this.durationText;
+                this.currentTimeText.innerText = this.formatTime(e.target.value);
 
                 if (this.playStatus) {
                     this.player.seekTo(e.target.value, true);
@@ -85,10 +101,30 @@
     }
 
     onPlayerStateChange(e) {
-        if (e.data == YT.PlayerState.PLAYING) {
-            this.updateInterval = setInterval(() => this.updateProgress(), 500);
-        } else {
-            clearInterval(this.updateInterval);
+        switch (e.data) {
+            case YT.PlayerState.ENDED:
+                clearInterval(this.updateInterval);
+                this.timeSlider.value = this.duration;
+                this.currentTimeText.innerText = this.durationText;
+                break;
+
+            case YT.PlayerState.PLAYING:
+                this.updateInterval = setInterval(() => this.updateProgress(), 500);
+                break;
+
+            case YT.PlayerState.PAUSED:
+                clearInterval(this.updateInterval);
+                break;
+
+            //case YT.PlayerState.BUFFERING:
+            //    break;
+
+            //case YT.PlayerState.CUED:
+            //    break;
+
+            default:
+                clearInterval(this.updateInterval);
+                break;
         }
     }
 
@@ -96,13 +132,13 @@
         this.currentTime = this.player.getCurrentTime();
 
         this.timeSlider.value = this.currentTime;
-        this.timeText.innerText = this.formatTime(this.currentTime) + "/" + this.durationText;
+        this.currentTimeText.innerText = this.formatTime(this.currentTime);
     }
 
     formatTime(seconds) {
         const m = Math.floor(seconds / 60);
         const s = Math.floor(seconds % 60);
-        return `${m}:${s.toString().padStart(2, "0")}`;
+        return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
     }
 }
 

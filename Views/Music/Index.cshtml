@@ -2,18 +2,34 @@
     Layout = TempData["Open"].ToString() == "_self" ? null : "~/Views/Shared/_WindowLayout.cshtml";
 }
 
-<div>
-
-    <section class="wrap">
-        <div class="yt"></div>
-        <p class="videoTitle"></p>
-        <div class="controlsWrap">
-            <button class="playBTN">播放</button>
-            <button class="next">下一首</button>
-            <button class="prev">上一首</button>
-            <button class="muteBtn">靜音</button>
-            <input type="range" min="0" max="100" class="volumeSlider">
-            <input type="range" min="0" max="0" value="0" class="timeSlider"><span class="timeText">0:00/0:00</span>
+<section class="wrap">
+    <div class="displayWrap">
+        <div class="yt" style="display: none;"></div>
+        <div class="ytVideoIMG"><img src="https://img.youtube.com/vi/" title="" /></div>
+    </div>
+    <div class="timeWrap">
+        <span class="currentTimeText">00:00:00</span>
+        <input type="range" min="0" max="0" value="0" class="timeSlider">
+        <span class="totalTimeText">00:00:00</span>
+    </div>
+    <div class="controlWrap">
+        <div class="videoTitle">
+            <div>
+                <h3></h3>
+            </div>
         </div>
+
+        <div class="middleWrap">
+            <button class="prevBTN">⏮️</button>
+            <button class="playBTN">▶️</button>
+            <button class="nextBTN">⏭️</button>
+        </div>
+
+        <div class="rightWrap">
+            <div class="volumeControl">
+                <button class="muteBTN">🔊</button>
+                <input type="range" min="0" max="100" class="volumeSlider">
+            </div>
+        </div>
+    </div>
     </section>
-</div>
