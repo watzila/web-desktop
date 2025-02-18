@@ -79,7 +79,8 @@
 
 .prevBTN,
 .nextBTN,
-.muteBTN {
+.muteBTN,
+.icon{
     font-size: 1.15rem;
 }
 

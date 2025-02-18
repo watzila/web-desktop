@@ -7,8 +7,8 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    width: 65%;
-    height: 70vh;
+    width: calc(var(--w)*1px);
+    height: calc(var(--h)*1px);
     border: 1px solid;
     border-radius: 5px;
     box-shadow: 5px 5px 8px rgb(0 0 0 / 15%), -5px -5px 8px rgb(0 0 0 / 15%);
@@ -20,7 +20,7 @@
     border: 0;
     border-radius: 0 0 5px 5px;
     background-color: #fff;
-    overflow:auto;
+    overflow: auto;
 }
 
 :is(.defaultWindow, .fillWindow) header {
@@ -69,10 +69,10 @@
     padding: 5px;
 }
 
-.windowIcon >img{
-    max-width:24px;
-    max-height:24px;
-}
+    .windowIcon > img {
+        max-width: 24px;
+        max-height: 24px;
+    }
 
 .round {
     border-radius: 50%;

@@ -13,6 +13,8 @@
         public bool InDesktop { get; set; }
         public bool IsSystem { get; set; }
         public DateTime UpdateDate { get; set; }
+        public double? Width { get; set; }
+        public double? Height { get; set; }
 
         public bool IsCurrent { get; set; }
     }
