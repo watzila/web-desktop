@@ -72,7 +72,7 @@ class IframeWindow {
             if (target) {
                 const title = target.querySelector(".title").innerText;
                 const iconPath = target.querySelector(".icon").src;
-                const data = { title, iconPath, id: target.dataset.value, open: "_blank" };
+                const data = { title, iconPath, id: target.dataset.value, open: "_blank", width: target.dataset.w, height: target.dataset.h };
                 Ajax.conn({
                     type: "post", url: target.dataset.href, data: data, fn: (res) => {
                         if (res) {

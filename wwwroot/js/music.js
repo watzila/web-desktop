@@ -3,7 +3,10 @@
         this.iframe = document.getElementById(id);
         this.volumeSlider = this.iframe.querySelector(".volumeSlider");
         this.playBTN = this.iframe.querySelector(".playBTN");
+        this.prevBTN = this.iframe.querySelector(".prevBTN");
+        this.nextBTN = this.iframe.querySelector(".nextBTN");
         this.muteBTN = this.iframe.querySelector(".muteBTN");
+        this.listBTN = this.iframe.querySelector(".listBTN");
         this.videoTitle = this.iframe.querySelector(".videoTitle h3");
         this.videoIMG = this.iframe.querySelector(".ytVideoIMG>img");
         this.timeSlider = this.iframe.querySelector(".timeSlider");
@@ -11,11 +14,12 @@
         this.totalTimeText = this.iframe.querySelector(".totalTimeText");
         this.player;
         this.playStatus = false;
-        this.musicUrl = ['5aH-Uw_-Tmc'];
+        this.musicId = ['5aH-Uw_-Tmc','kcxCVn5ToQc'];
         this.duration = 0;//影片總時長（秒）
         this.durationText = "00:00";
         this.currentTime = 0;
         this.updateInterval;
+        this.index = 0;
 
         this.init();
     }
@@ -23,9 +27,9 @@
     init() {
         const youtubeIframe = this.iframe.querySelector(".yt");
         this.player = new YT.Player(youtubeIframe, {
-            height: '200',
-            width: '200',
-            videoId: this.musicUrl[0],
+            height: '0',
+            width: '0',
+            videoId: this.musicId[this.index],
             playerVars: {
                 modestbranding: 1,
                 disablekb: 1,
@@ -39,10 +43,11 @@
             }
         });
 
-        console.log(this.player);
+        //console.log(this.player);
     }
 
     play(id) {
+        console.log(id)
         this.player.loadVideoById(id);
     }
 
@@ -57,18 +62,35 @@
         this.timeSlider.max = this.duration;
         this.durationText = this.formatTime(this.duration);
         this.totalTimeText.innerText = this.durationText;
-        this.videoIMG.src = this.getIMG(this.musicUrl[0]);
+        this.videoIMG.src = this.getIMG(this.musicId[0]);
+        this.videoIMG.title = this.player.videoTitle;
 
         this.playBTN.onclick = () => {
             if (this.playStatus) {
                 this.playStatus = false;
                 this.playBTN.innerText = "▶️";
+                this.playBTN.title = "播放";
                 this.player.pauseVideo();
             } else {
                 this.playStatus = true;
                 this.playBTN.innerText = "⏸️";
+                this.playBTN.title = "暫停";
                 this.player.seekTo(this.currentTime, true);
                 this.player.playVideo();
+            }
+        };
+
+        this.nextBTN.onclick = () => {
+            if (this.index + 1 < this.musicId.length) {
+                this.index += 1;
+                this.play(this.musicId[this.index]);
+            }
+        };
+
+        this.prevBTN.onclick = () => {
+            if (this.index - 1 >= 0) {
+                this.index -= 1;
+                this.play(this.musicId[this.index]);
             }
         };
 

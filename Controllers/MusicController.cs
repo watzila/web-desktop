@@ -17,6 +17,8 @@ namespace Backstage.Controllers {
             TempData["iconPath"] = paramModel.IconPath;
             TempData["open"] = paramModel.Open;
             TempData["js"] = "Music";
+            TempData["w"] = paramModel.Width;
+            TempData["h"] = paramModel.Height;
 
             return View();
         }
