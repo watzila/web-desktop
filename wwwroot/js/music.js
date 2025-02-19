@@ -14,7 +14,7 @@
         this.totalTimeText = this.iframe.querySelector(".totalTimeText");
         this.player;
         this.playStatus = false;
-        this.musicId = ['5aH-Uw_-Tmc','kcxCVn5ToQc'];
+        this.musicId = ['5aH-Uw_-Tmc', 'kcxCVn5ToQc'];
         this.duration = 0;//影片總時長（秒）
         this.durationText = "00:00";
         this.currentTime = 0;
@@ -42,39 +42,38 @@
                 "onStateChange": (e) => this.onPlayerStateChange(e)
             }
         });
-
-        //console.log(this.player);
     }
 
-    play(id) {
-        console.log(id)
-        this.player.loadVideoById(id);
-    }
-
-    getIMG(id,num=0) {
-        return `https://img.youtube.com/vi/${id}/${num}.jpg`;
-    }
-
-    onPlayerReady(e) {
+    displayInit() {
         this.videoTitle.innerText = this.player.videoTitle;
         this.volumeSlider.value = this.player.getVolume();
         this.duration = this.player.getDuration();
         this.timeSlider.max = this.duration;
         this.durationText = this.formatTime(this.duration);
         this.totalTimeText.innerText = this.durationText;
-        this.videoIMG.src = this.getIMG(this.musicId[0]);
         this.videoIMG.title = this.player.videoTitle;
+        this.updateProgress();
+        //console.log(this.player);
+    }
+
+    play(id) {
+        this.videoIMG.src = this.getIMG(id);
+        this.player.loadVideoById(id);
+        setTimeout(() => this.displayInit(id), 2000);
+    }
+
+    getIMG(id, num = 0) {
+        return `https://img.youtube.com/vi/${id}/${num}.jpg`;
+    }
+
+    onPlayerReady(e) {
+        this.videoIMG.src = this.getIMG(this.musicId[0]);
+        this.displayInit();
 
         this.playBTN.onclick = () => {
             if (this.playStatus) {
-                this.playStatus = false;
-                this.playBTN.innerText = "▶️";
-                this.playBTN.title = "播放";
                 this.player.pauseVideo();
             } else {
-                this.playStatus = true;
-                this.playBTN.innerText = "⏸️";
-                this.playBTN.title = "暫停";
                 this.player.seekTo(this.currentTime, true);
                 this.player.playVideo();
             }
@@ -118,7 +117,7 @@
                 if (this.playStatus) {
                     this.player.seekTo(e.target.value, true);
                 }
-            }
+            };
         };
     }
 
@@ -132,10 +131,16 @@
 
             case YT.PlayerState.PLAYING:
                 this.updateInterval = setInterval(() => this.updateProgress(), 500);
+                this.playStatus = true;
+                this.playBTN.innerText = "⏸️";
+                this.playBTN.title = "暫停";
                 break;
 
             case YT.PlayerState.PAUSED:
                 clearInterval(this.updateInterval);
+                this.playStatus = false;
+                this.playBTN.innerText = "▶️";
+                this.playBTN.title = "播放";
                 break;
 
             //case YT.PlayerState.BUFFERING:
