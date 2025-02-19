@@ -39,7 +39,8 @@ class IframeWindow {
 
                 ClassRegistry.loadClass(windowEle.dataset.class).then(m => {
                     if (m) {
-                        console.log(new m(windowEle.id));
+                        const index = this.allWindows.findIndex(a => a.ele == windowEle);
+                        this.allWindows[index].mainClasses.push(new m(windowEle.id));
                     }
                 }).catch(error => eventBus.emit("error", error.message));
             });
@@ -100,7 +101,8 @@ class IframeWindow {
                                     open: true,
                                     btn: document.querySelector("#f" + randomId + "BTN"),
                                     history: [{ url: target.dataset.href, data: data }],
-                                    historyIndex: 1
+                                    historyIndex: 1,
+                                    mainClasses:[]
                                 });
                                 this.workingChoose("f" + randomId + "BTN");
                                 this.clickBTNable(windowEle);
@@ -135,6 +137,7 @@ class IframeWindow {
             iframe.remove();
             const index = this.allWindows.findIndex(a => a.ele == iframe);
             this.allWindows[index].btn.remove();
+            this.allWindows[index].mainClasses.forEach(a => a = null);
             this.allWindows.splice(index, 1);
             this.zIndex = (this.allWindows.length > 0) ? Math.max(...this.allWindows.map(a => a.ele.style.zIndex * 1)) + 1 : 1;
         };
