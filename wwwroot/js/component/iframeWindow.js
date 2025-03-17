@@ -154,10 +154,13 @@ class IframeWindow {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
                 this.zIndex++;
-
-                this.workingChoose("");
             }
 
+            const w = this.allWindows.find(a => a.ele == iframe);
+            if (w) {
+                w.btn.removeAttribute("style");
+                w.open = false;
+            }
             iframe.classList.toggle("closed");
         };
     }
