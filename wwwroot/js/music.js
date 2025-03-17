@@ -6,12 +6,14 @@
         this.prevBTN = this.iframe.querySelector(".prevBTN");
         this.nextBTN = this.iframe.querySelector(".nextBTN");
         this.muteBTN = this.iframe.querySelector(".muteBTN");
-        this.listBTN = this.iframe.querySelector(".listBTN");
+        this.listBTN = this.iframe.querySelector("#listBTN");
         this.videoTitle = this.iframe.querySelector(".videoTitle h3");
         this.videoIMG = this.iframe.querySelector(".ytVideoIMG>img");
         this.timeSlider = this.iframe.querySelector(".timeSlider");
         this.currentTimeText = this.iframe.querySelector(".currentTimeText");
         this.totalTimeText = this.iframe.querySelector(".totalTimeText");
+        this.playlistPanel = this.iframe.querySelector("#playlistPanel");
+        this.removeMusicBTNs = this.iframe.querySelectorAll(".removeMusicBTN");
         this.player;
         this.playStatus = false;
         this.musicId = ['5aH-Uw_-Tmc', 'kcxCVn5ToQc'];
@@ -25,6 +27,16 @@
     }
 
     init() {
+        this.listBTN.onclick = () => {
+            this.playlistPanel.classList.toggle("closed");
+        };
+
+        this.removeMusicBTNs.forEach((btn, index) => {
+            btn.onclick = (e) => {
+                e.target.closest("li").remove();
+            };
+        });
+
         const youtubeIframe = this.iframe.querySelector(".yt");
         this.player = new YT.Player(youtubeIframe, {
             height: '0',
@@ -35,7 +47,6 @@
                 disablekb: 1,
                 enablejsapi: 1, // 啟用 API 控制
                 controls: 0,
-                referrerpolicy: "origin",
             },
             events: {
                 "onReady": (e) => this.onPlayerReady(e),
@@ -44,6 +55,9 @@
         });
     }
 
+    /**
+     * 初始化播放器顯示
+     */
     displayInit() {
         this.videoTitle.innerText = this.player.videoTitle;
         this.volumeSlider.value = this.player.getVolume();
@@ -62,10 +76,20 @@
         setTimeout(() => this.displayInit(id), 2000);
     }
 
+    /**
+     * 取得 YouTube 影片預覽圖
+     * @param {string} id YouTube 影片 ID
+     * @param {number} num 預覽圖編號
+     * @returns {string} YouTube 影片預覽圖網址
+     */
     getIMG(id, num = 0) {
         return `https://img.youtube.com/vi/${id}/${num}.jpg`;
     }
 
+    /**
+     * 播放器準備就緒時觸發
+     * @param {Object} e 播放器事件物件
+     */
     onPlayerReady(e) {
         this.videoIMG.src = this.getIMG(this.musicId[0]);
         this.displayInit();
@@ -121,6 +145,10 @@
         };
     }
 
+    /**
+     * 播放器狀態改變時觸發
+     * @param {Object} e 播放器事件物件
+     */
     onPlayerStateChange(e) {
         switch (e.data) {
             case YT.PlayerState.ENDED:
@@ -155,6 +183,9 @@
         }
     }
 
+    /**
+     * 更新播放進度
+     */
     updateProgress() {
         this.currentTime = this.player.getCurrentTime();
 
@@ -162,10 +193,31 @@
         this.currentTimeText.innerText = this.formatTime(this.currentTime);
     }
 
+    /**
+     * 格式化時間
+     * @param {number} seconds 秒數
+     * @returns {string} 時間字串
+     */
     formatTime(seconds) {
         const m = Math.floor(seconds / 60);
         const s = Math.floor(seconds % 60);
         return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    }
+
+    /**
+     * 取得 YouTube 影片 ID
+     * @param {string} url YouTube 影片網址
+     * @returns {string} YouTube 影片 ID
+     */
+    parseYoutubeUrl(url) {
+        let id = "";
+        const p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+        const urlMatch = url.match(p)
+        if (urlMatch) {
+            id = urlMatch[1];
+        }
+
+        return id;
     }
 }
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
 namespace Backstage.Controllers {
-    public class MusicController : Controller {
+    public class MusicController:Controller {
         private readonly IDbConnection dbConnection;
 
         public MusicController(IDbConnection dbConnection) {
@@ -17,10 +17,25 @@ namespace Backstage.Controllers {
             TempData["iconPath"] = paramModel.IconPath;
             TempData["open"] = paramModel.Open;
             TempData["js"] = "Music";
-            TempData["w"] = paramModel.Width;
-            TempData["h"] = paramModel.Height;
+            if(paramModel.Width.HasValue) {
+                TempData["w"] = paramModel.Width.Value;
+            }
+            if(paramModel.Height.HasValue) {
+                TempData["h"] = paramModel.Height;
+            }
 
-            return View();
+            List<Music> data = new List<Music>();
+
+            try {
+                string sql = "select * from Music order by Sort;";
+                var result = dbConnection.Query<Music>(sql);
+
+                data = result.ToList();
+            } catch(Exception ex) {
+                //log.ErrorMessage = ex.ToString();
+            }
+
+            return View(data);
         }
     }
 }

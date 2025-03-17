@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<Backstage.Models.Music>
+@{
     Layout = TempData["Open"].ToString() == "_self" ? null : "~/Views/Shared/_WindowLayout.cshtml";
 }
 
@@ -6,6 +7,32 @@
     <div class="displayWrap">
         <div class="yt" style="display: none;"></div>
         <div class="ytVideoIMG"><img src="https://img.youtube.com/vi/" title="" /></div>
+
+        <div class="playlistPanel closed" id="playlistPanel">
+            <div class="header">
+                <h3>播放列表</h3>
+                <div class="playlistControls">
+                    <div class="dropdown">
+                        <button class="dropBTN" title="新增音樂"><i class="icofont-plus"></i> &ensp;新增音樂</button>
+                        <div class="dropdown-content">
+                            <button class="addFile" title="上傳檔案"><i class="icofont-folder-open"></i>&ensp;上傳檔案</button>
+                            <button class="addYouTube" title="輸入Youtube連結"><i class="icofont-link"></i>&ensp;輸入Youtube連結</button>
+                        </div>
+                    </div>
+
+                    <input type="file" class="musicFileInput closed" accept="audio/*">
+                </div>
+            </div>
+
+            <ul class="playlist">
+                @foreach (var music in Model) {
+                    <li data-vid="@music.VID">
+                        <span>@music.Name</span>
+                        <button class="removeMusicBTN" value="@music.ID"><b>&#128473;</b></button>
+                    </li>
+                }
+            </ul>
+        </div>
     </div>
     <div class="timeWrap">
         <span class="currentTimeText">00:00:00</span>
@@ -30,7 +57,7 @@
                 <button class="muteBTN" title="音量">🔊</button>
                 <input type="range" min="0" max="100" class="volumeSlider">
             </div>
-            <button class="icon listBTN"><i class="icofont-listing-box"></i></button>
+            <button class="icon" id="listBTN"><i class="icofont-listing-box"></i></button>
         </div>
     </div>
 </section>

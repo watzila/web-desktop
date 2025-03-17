@@ -40,14 +40,21 @@ button.working:before {
 
 .fillScreen {
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-rows: auto 3rem;
     width: 100vw;
     max-width: 100vw;
     height: 100vh;
     max-height: 100vh;
-    flex-direction: column;
-    background: url("/images/desktopBG.jpg") no-repeat center/cover;
     overflow: hidden;
+}
+
+.desktop {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(90px, 1fr));
+    grid-auto-flow: column;
+    background: url("/images/desktopBG.jpg") no-repeat center/cover;
 }
 
 .workingWrap {
@@ -59,7 +66,6 @@ button.working:before {
     display: flex;
     align-items: center;
     background-color: #818181fa;
-    z-index: 99999999;
 }
 
 .dateTime {

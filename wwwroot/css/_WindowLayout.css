@@ -5,8 +5,8 @@
 
 .defaultWindow {
     position: absolute;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 35px auto;
     width: calc(var(--w)*1px);
     height: calc(var(--h)*1px);
     border: 1px solid;
@@ -111,27 +111,22 @@
         cursor: nwse-resize;
     }
 
-.iframe {
+.iframe nav {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 30px 40px;
+    background-color: #eee;
 }
 
-    .iframe nav {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        padding: 30px 40px;
-        background-color: #eee;
-    }
-
-    .iframe section {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        height: 100%;
-        padding: 15px;
-        overflow: auto;
-    }
+.iframe section {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    overflow: auto;
+}
 
 .function {
     flex-grow: 0;
