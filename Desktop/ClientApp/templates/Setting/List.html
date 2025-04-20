@@ -1,0 +1,25 @@
+﻿<div>
+    <nav>
+        <div>
+            <img src="/images/Icon/user_icon.png" class="round" width="96" height="96" />
+        </div>
+        <h1>名子</h1>
+    </nav>
+
+    <section class="wrap">
+        {{#each data}}
+        <div class="function">
+            <button data-href="{{executeURL}}" data-value="{{id}}" data-click="1">
+                <div>
+                    <img src="{{icon}}" width="48" height="48" />
+                </div>
+                <div>
+                    <h3>{{name}}</h3>
+                    <span>{{directions}}</span>
+                </div>
+            </button>
+        </div>
+        {{/each}}
+
+    </section>
+</div>

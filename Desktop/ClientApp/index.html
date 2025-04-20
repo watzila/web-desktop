@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="zh-hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backstage</title>
+    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="stylesheet" href="/css/icofont.css" />
+    <link rel="stylesheet" href="/css/_layout.css" />
+    <link rel="stylesheet" href="/css/_WindowLayout.css" />
+    <link rel="stylesheet" href="/css/calendar.css" />
+    <link rel="stylesheet" href="/css/folder.css" />
+    <link rel="stylesheet" href="/css/table.css" />
+    <link rel="stylesheet" href="/css/music.css" />
+</head>
+<body>
+    <div class="fillScreen" id="desktop">
+        <main class="noUserSelect desktop"></main>
+
+        <nav class="workingWrap">
+            <div class="opening" id="work"></div>
+
+            <div class="working weather"></div>
+
+            <div class="working dateTime noUserSelect" id="dateTime">
+                <span><i>上午</i><time>00:00</time></span>
+                <span>2023/01/01</span>
+            </div>
+
+            <div class="working notification noUserSelect" id="notification">
+                <i class="icofont-notification"></i>
+            </div>
+
+            <div id="infoWrap"></div>
+
+            <div class="calendar closed" id="calendar">
+                <!--<div class="calendarHeader">
+                    <img src="https://picsum.photos/300/180">
+                </div>-->
+
+                <div class="calendarWrap noUserSelect">
+                    <section class="calendarBody">
+                        <header>
+                            <button id="previous">&lt;</button>
+                            <h2><span id="year">2021</span> <span id="month">一月</span></h2>
+                            <button id="next">&gt;</button>
+                        </header>
+
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>日</th>
+                                        <th>一</th>
+                                        <th>二</th>
+                                        <th>三</th>
+                                        <th>四</th>
+                                        <th>五</th>
+                                        <th>六</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="date"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <script async src="https://www.youtube.com/iframe_api"></script>
+    <script src="/js/component/calendar.js"></script>
+    <script src="/app.js" type="module"></script>
+</body>
+</html>

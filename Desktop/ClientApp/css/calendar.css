@@ -1,0 +1,116 @@
+﻿.calendar {
+    position: fixed;
+    bottom: 48px;
+    right: 0px;
+    max-width: 300px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: -3px -3px 5px #ccc;
+}
+
+.calendarHeader {
+    background-color: rgb(168, 168, 168);
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+}
+
+.calendarWrap {
+    position: relative;
+}
+
+.calendarBody {
+    width: 100%;
+    padding: 20px;
+    border-radius: 0 0 10px 10px;
+    background-color: #f8f8f8;
+    font-family: sans-serif;
+}
+
+.calendarBody header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+}
+
+    .calendarBody header span {
+        color: initial;
+    }
+
+.calendarBody header span input {
+    width: 20%;
+    height: 100%;
+    vertical-align:bottom;
+}
+
+.calendarBody header button {
+    width: 10%;
+    font-size: 20px;
+    transition: 0.1s ease-in-out;
+}
+
+    .calendarBody header button:hover,
+    .calendarBody div table tbody td button:hover {
+        transform: scale(1.5);
+    }
+
+.calendarBody> div {
+    padding: 10px;
+}
+
+    .calendarBody > div table {
+        width: 100%;
+    }
+
+        .calendarBody > div table th {
+            padding: 10px 0;
+            color: rgb(88, 88, 88);
+        }
+
+        .calendarBody > div table td {
+            padding: 5px 0;
+        }
+
+        .calendarBody > div table th,
+        .calendarBody > div table td {
+            text-align: center;
+            line-height: 0;
+        }
+
+        .calendarBody > div table tbody td {
+            opacity: 0;
+            animation: calendarFadeIn 0.1s cubic-bezier(1, 1, 0.59, 0.93) forwards var(--i);
+        }
+
+            .calendarBody > div table tbody td button {
+                width: 30px;
+                height: 30px;
+                font-weight: bold;
+                line-height: 0;
+                border-radius: 50%;
+                transition: 0.1s ease-in-out;
+            }
+
+    .calendarBody .active {
+        border: 2px solid red;
+        box-shadow: -2px -2px 5px #fff, 2px 2px 5px #9497a3;
+    }
+
+@keyframes calendarFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    90% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}

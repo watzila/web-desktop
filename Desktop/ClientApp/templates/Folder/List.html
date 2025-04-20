@@ -1,0 +1,25 @@
+﻿<div class="content">
+    <div class="layout">
+        <div class="table">
+            <div class="thead">
+                <span class="name">名稱</span>
+                <span class="date">修改日期</span>
+                <span class="type">類型</span>
+            </div>
+            {{#each data}}
+            <button class="tbody" data-href="{{executeURL}}" data-value="{{id}}" data-type="{{type}}">
+                <span class="name">
+                    {{#if icon }}
+                        <img src="{{icon}}" width="24" height="24"/>
+                    {{#else}}
+                        {{defaultIcon}}
+                    {{/if}}
+                    {{name}}
+                </span>
+                <span class="date">{{updateDate}}</span>
+                <span class="type">{{typeText}}</span>
+            </button>
+            {{/each}}
+        </div>
+    </div>
+</div>
