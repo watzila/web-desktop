@@ -12,7 +12,7 @@
             public string TypeText { get; set; }//類型
             public string Icon { get; set; }//圖標
             public string DefaultIcon { get; set; }//預設圖標
-            public DateTime UpdateDate { get; set; }
+            public string UpdateDate { get; set; }
             public double? Width { get; set; }
             public double? Height { get; set; }
             public bool IsCurrent { get; set; }

@@ -3,7 +3,7 @@ import Ajax from "./component/ajax.js";
 import eventBus from "./component/eventBus.js";
 
 class Music extends BaseComponent {
-    constructor(id, model = []) {
+    constructor(id, model) {
         super(id);
         this.volumeSlider = this.iframe.querySelector(".volumeSlider");
         this.playBTN = this.iframe.querySelector(".playBTN");

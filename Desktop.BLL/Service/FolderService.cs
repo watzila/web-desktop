@@ -16,9 +16,11 @@ namespace Desktop.BLL.Service {
                 string sql = "select * from ACLObject where ParentID=@ParentID and InDesktop=0 order by Sort;";
                 var data = connection.Query<ACLObject>(sql, parameters);
                 foreach (var item in data) {
+                    item.TypeText = share.GetTypeText(item.Type);
                     if (string.IsNullOrWhiteSpace(item.Icon)) {
                         item.DefaultIcon = share.GetDefaultIcon(item.Type);
-                        item.TypeText = share.GetTypeText(item.Type);
+                    } else {
+                        item.Icon = $"/images/Icon/{item.Icon}";
                     }
                 }
                 result.Data = mapper.Map<List<ACLObjectModel.Items>>(data);

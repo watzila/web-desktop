@@ -14,7 +14,7 @@ namespace Desktop.Controllers {
 
             try {
                 ACLObjectModel aclObjectModel = folderService.List(param);
-                result = new ResultModel<ACLObjectModel>(aclObjectModel);
+                result = new ResultModel<ACLObjectModel>(aclObjectModel, "Table");
             } catch (Exception ex) {
                 result = new ResultModel<ACLObjectModel>(ex);
             }

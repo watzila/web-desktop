@@ -282,7 +282,7 @@ class IframeWindow {
     }
 
     handleEvent(e, mainEle, obj) {
-        const item = e.target.closest("button");
+        const item = e.target.closest("button") || e.target.closest(".button");
         if (!item) return;
         e.stopPropagation();
         //e.preventDefault();

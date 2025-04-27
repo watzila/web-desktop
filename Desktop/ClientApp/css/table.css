@@ -1,36 +1,78 @@
-﻿.sTable {
-    width:100%;
-    border: #d3d3d3 solid 1px;
-    box-shadow: 0 2px 1px rgb(0 0 0 / 5%);
+﻿.table {
+    table-layout: fixed;
+    width: 750px;
     border-collapse: collapse;
 }
 
-    .sTable thead {
-        background-color: #e7eaf9;
-    }
-
-    .sTable th {
-        min-width: 100px;
+    .table .thead th {
+        position: relative;
         padding: 5px;
         font-size: 1em;
-        text-align: center;
+        text-align: start;
         border-right: 1px solid #cecece;
-        border-bottom: 1px solid #cecece;
         font-weight: 500;
         letter-spacing: 0px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        user-select: none;
     }
 
-    .sTable td {
-        padding: 5px;
-        text-align: center;
-        font-size: 0.938em;
-        border: #ddd 1px solid;
-    }
-
-        .sTable tr:last-child {
-            border-bottom: none;
+        .table .thead th .colResizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            cursor: col-resize;
+            z-index: 1;
         }
 
-    .sTable tbody tr:nth-child(2n) {
-        background-color: #f9fafd
+        .table .thead th:first-child {
+            border-left: 1px solid #cecece;
+        }
+
+        .table .thead th:hover {
+            background-color: #e7eaf9;
+        }
+
+    .table .w50 {
+        width: 375px;
+        min-width: 50px;
+    }
+
+    .table .w25 {
+        width: 187.5px;
+        min-width: 50px;
+    }
+
+    .table .tbody td {
+        padding: 5px;
+        font-size: 1em;
+        text-align: start;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        user-select: none;
+    }
+
+        .table .tbody td i {
+            font-size: 1.15em;
+        }
+
+    .table .tbody tr.click {
+        background-color: #e9f6ff;
+        outline: 1px solid #b6d0e1;
+    }
+
+    .table .tbody tr:hover:not(.click) {
+        background-color: #f1f1f1;
+    }
+
+    .table .tbody .name > img {
+        width: 1.15em;
+    }
+
+    .table .tbody td:not(.name) {
+        color: #333;
     }

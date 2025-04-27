@@ -14,10 +14,6 @@ class BaseComponent {
         }
     }
 
-    init() {
-
-    }
-
     /**設置事件*/
     setEvent(element, event, handler) {
         element.addEventListener(event, handler);
