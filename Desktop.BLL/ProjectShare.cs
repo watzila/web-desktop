@@ -6,9 +6,9 @@ namespace Desktop.BLL {
         public string GetDefaultIcon(int type) {
             switch (type) {
                 case 2:
-                    return "<i class=\"icofont-file-alt\"></i>";
+                    return "<i class=\"icofont-file-alt\" data-icon=\"icon\"></i>";
                 default:
-                    return "<i class=\"icofont-file-file\"></i>";
+                    return "<i class=\"icofont-file-file\" data-icon=\"icon\"></i>";
             }
         }
 

@@ -1,0 +1,22 @@
+﻿<section class="appLayout show-nav">
+    <nav class="nav">
+        <menu>
+            <li class="menu-item">
+                檔案
+                <ul class="dropdown">
+                    <li><button id="saveBTN">儲存</button></li>
+                    <li><button id="closeBTN">結束</button></li>
+                </ul>
+            </li>
+        </menu>
+    </nav>
+
+    <div class="mainArea">
+        <section class="content pad0">
+            <form class="fill100">
+                <input type="hidden" name="id" value="{{id}}" />
+                <textarea class="fill100" style="--size:16px" name="content">{{content}}</textarea>
+            </form>
+        </section>
+    </div>
+</section>

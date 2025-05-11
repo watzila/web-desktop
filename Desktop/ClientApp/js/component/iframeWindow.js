@@ -63,9 +63,10 @@ class IframeWindow {
      * @param {Element} target
      */
     open(target) {
+        //console.log(target);
         return new Promise((resolve) => {
             if (target) {
-                const title = target.querySelector(".title").innerText;
+                const title = target.title;
                 const iconPath = target.querySelector(".icon").src;
                 const data = { title, iconPath, w: target.dataset.w, h: target.dataset.h};
                 Ajax.conn({
@@ -94,6 +95,7 @@ class IframeWindow {
                             this.currentWindow = windowEle;
                             this.allWindows.push({
                                 randomId: randomId,
+                                type: target.dataset.type,
                                 ele: windowEle,
                                 url: target.dataset.href,
                                 subEle: windowEle.querySelector(".wrap"),
@@ -301,13 +303,22 @@ class IframeWindow {
     }
 
     handleClick(item, mainEle, obj) {
-        const data = { id: item.dataset.value || null };
+        if (obj.type != item.dataset.type) {
+            this.open(item);
+            return;
+        }
 
+        const data = { id: item.dataset.value || null };
+        //console.log(item, mainEle, obj);
         Ajax.conn({
             type: "post", url: item.dataset.href, data: data, fn: async (res) => {
                 if (!res) return;
-                
+                //console.log(res)
                 const html = await TemplateEngine.view(`${item.dataset.href.replace("api", "templates")}.html`, res.returnData);
+                const headerEle = obj.ele.querySelector("header>.title h4");
+                const windowIconEle = obj.ele.querySelector("header>.windowIcon");
+                windowIconEle.innerHTML = item.querySelector("[data-icon]").outerHTML
+                headerEle.innerText = item.title;
                 mainEle.innerHTML = html;
                 obj.url = item.dataset.href;
                 obj.historyIndex += 1;

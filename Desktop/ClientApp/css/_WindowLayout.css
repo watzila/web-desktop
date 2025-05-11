@@ -111,23 +111,6 @@
         cursor: nwse-resize;
     }
 
-.iframe nav {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 30px 40px;
-    background-color: #eee;
-}
-
-.iframe section {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-    height: 100%;
-    padding: 15px;
-    overflow: auto;
-}
-
 .function {
     flex-grow: 0;
     flex-shrink: 0;
@@ -155,12 +138,106 @@
         outline: 2px solid #eee;
     }
 
-.content {
-    display: flex;
+.fill100 {
+    width: 100%;
     height: 100%;
 }
 
-.layout {
+textarea {
+    font-size: var(--size);
+}
+
+.appLayout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     width: 100%;
-    padding: 15px;
+}
+
+    /* nav 頂部欄 */
+    .appLayout .nav {
+        display: flex;
+        align-items: center;
+        min-height: 1.8rem;
+        border-bottom: 1px solid #ddd;
+    }
+
+.nav menu {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+}
+
+.menu-item {
+    position: relative;
+    height: 100%;
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+    .menu-item:hover {
+        background-color: #ddd;
+    }
+
+        .menu-item:hover .dropdown {
+            display: block;
+        }
+
+    .menu-item .dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 100px;
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #ccc;
+    }
+
+        .menu-item .dropdown li button {
+            display: block;
+            width: 100%;
+            padding: 5px 10px;
+            text-align: start;
+        }
+
+            .menu-item .dropdown li button:hover {
+                background-color: #eee;
+            }
+
+/* 中間區域 */
+.appLayout .mainArea {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* 側邊選單 */
+.appLayout .slider {
+    width: 200px;
+    background-color: #f4f4f4;
+    overflow-y: auto;
+}
+
+/* 主內容區域 */
+.appLayout .content {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* 控制是否顯示 nav/slider 的 class（預設都有） */
+.appLayout:not(.show-nav) .nav {
+    display: none;
+}
+
+.appLayout:not(.show-slider) .slider {
+    display: none;
+}
+
+.appLayout:not(.show-slider) .content {
+    flex: 1;
+    width: 100%;
 }

@@ -1,6 +1,10 @@
-﻿.table {
+﻿:root {
+    --tableW: 550px;
+}
+
+.table {
     table-layout: fixed;
-    width: 750px;
+    width: var(--tableW);
     border-collapse: collapse;
 }
 
@@ -37,12 +41,12 @@
         }
 
     .table .w50 {
-        width: 375px;
+        width: calc(var(--tableW)/2);
         min-width: 50px;
     }
 
     .table .w25 {
-        width: 187.5px;
+        width: calc(var(--tableW)/4);
         min-width: 50px;
     }
 

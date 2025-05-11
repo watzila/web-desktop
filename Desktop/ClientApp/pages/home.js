@@ -4,8 +4,7 @@ import TemplateEngine from "/js/component/TemplateEngine.js";
 //取得桌面功能按鈕
 Ajax.conn({
     type: "get", url: "/api/Home/DesktopList", fn: async (res) => {
-        //const result = JSON.parse(res);
-        //console.log(result);
+        //console.log(res);
         const html = await TemplateEngine.view("/templates/home.html", res.returnData);
         document.querySelector("#desktop>main").innerHTML = html;
         import("/js/desktop.js");
@@ -14,9 +13,8 @@ Ajax.conn({
 
 //取得天氣
 Ajax.conn({
-    type: "get", url: encodeURI("/api/Home/Weather?locationId=F-D0047-075&locationName=太平區"), fn: async (res) => {
-        //const result = JSON.parse(res);
-        //console.log(result);
+    type: "get", url: "/api/Home/Weather", data: { locationId: "F-D0047-075", locationName: "太平區" }, fn: async (res) => {
+        //console.log(res);
         const html = await TemplateEngine.view("/templates/weather.html", res.returnData);
         document.querySelector("#desktop>nav>.weather").innerHTML = html;
     }

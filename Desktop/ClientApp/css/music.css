@@ -1,4 +1,9 @@
-﻿.music .displayWrap {
+﻿.music .content {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.music .displayWrap {
     position: relative;
     width: 100%;
     height: 80%;
@@ -156,7 +161,7 @@
 }
 
     .music .playlist li:hover {
-        background-color:#eee;
+        background-color: #eee;
     }
 
     .music .playlist li .removeMusicBTN {
@@ -209,7 +214,7 @@
 
 .music dialog.dialog-box {
     top: 25%;
-    width: 260px;
+    width: 300px;
     margin: auto;
     padding: 1rem;
     border: none;

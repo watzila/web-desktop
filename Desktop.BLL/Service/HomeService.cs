@@ -14,6 +14,7 @@ namespace Desktop.BLL.Service {
             using (var connection = unitOfWork.CreateConnection()) {
                 string sql = "select * from ACLObject where Status=1 and InDesktop=1 order by Sort;";
                 var data = connection.Query<ACLObject>(sql);
+                var aa = JsonConvert.SerializeObject(data);
                 foreach (var item in data) {
                     item.Icon = string.IsNullOrWhiteSpace(item.Icon) ? "https://placehold.jp/50x50.png" : $"/images/Icon/{item.Icon}";
                 }

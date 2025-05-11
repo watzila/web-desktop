@@ -10,6 +10,7 @@ class Desktop {
         this.notification = document.getElementById("notification");
         this.work = document.getElementById("work");
         this.calendar = document.getElementById("calendar");
+        this.turnOffBTN = document.getElementById("turnOffBTN");
         this.nowDate;
         this.hr12Name;
         this.nowTime;
@@ -37,6 +38,10 @@ class Desktop {
         this.dateTime.onclick = (e) => {
             e.stopPropagation();
             this.calendar.classList.toggle("closed");
+        };
+
+        this.turnOffBTN.onclick = () => {
+            this.deleteDB();
         };
 
         window.addEventListener("click", (e) => {
@@ -75,7 +80,14 @@ class Desktop {
         }
     }
 
-
+    deleteDB() {
+        indexedDB.deleteDatabase("DesktopDB").onsuccess = () => {
+            this.notificationEvent.push({ title: "IndexedDB", msg: "已刪除" });
+            setTimeout(function () {
+                window.close();
+            }, 1500);
+        };
+    }
 
 }
 

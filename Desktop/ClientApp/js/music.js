@@ -54,7 +54,7 @@ class Music extends BaseComponent {
                 switch (data.source) {
                     case "youtube":
                         await Ajax.conn({
-                            type: "get", url: `https://noembed.com/embed?dataType=json&url=${data.path}`, fn: (res) => {
+                            type: "get", url: "https://noembed.com/embed", data: { dataType: "json", url: data.path }, fn: (res) => {
                                 if (!res || !res.title) throw new Error(JSON.stringify({ title: data.path, msg: "✖無法取得影片資訊" }));
 
                                 data.name = res.title;
@@ -66,7 +66,7 @@ class Music extends BaseComponent {
                 }
 
                 this.add(data);
-            } catch (error){
+            } catch (error) {
                 eventBus.emit("error", error.message);
             }
         });

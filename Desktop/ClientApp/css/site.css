@@ -22,6 +22,17 @@ input {
     outline: none;
 }
 
+textarea {
+    border: 0;
+    resize: none;
+    vertical-align: middle;
+}
+
+    input:focus, textarea:focus {
+        outline: none;
+        border: none;
+    }
+
 img {
     width: 100%;
     height: 100%;
@@ -37,4 +48,8 @@ button {
 
 i {
     font-style: normal;
+}
+
+.pad0 {
+    padding: 0 !important;
 }
