@@ -4,7 +4,7 @@
     }
 
     init() {
-        import("/pages/home.js");
+        import("./pages/home.js");
     }
 }
 

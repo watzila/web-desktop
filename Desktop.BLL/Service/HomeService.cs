@@ -16,7 +16,7 @@ namespace Desktop.BLL.Service {
                 var data = connection.Query<ACLObject>(sql);
                 var aa = JsonConvert.SerializeObject(data);
                 foreach (var item in data) {
-                    item.Icon = string.IsNullOrWhiteSpace(item.Icon) ? "https://placehold.jp/50x50.png" : $"/images/Icon/{item.Icon}";
+                    item.Icon = string.IsNullOrWhiteSpace(item.Icon) ? "https://placehold.jp/50x50.png" : $"./images/Icon/{item.Icon}";
                 }
                 result.Data = mapper.Map<List<ACLObjectModel.Items>>(data);
             }
@@ -54,22 +54,22 @@ namespace Desktop.BLL.Service {
                         case 26:
                         case 27:
                         case 28:
-                            result.WeatherIMG = "/images/sunIMG.svg";
+                            result.WeatherIMG = "./images/sunIMG.svg";
                             break;
 
                         case 4:
                         case 5:
                         case 6:
                         case 7:
-                            result.WeatherIMG = "/images/cloudIMG.svg";
+                            result.WeatherIMG = "./images/cloudIMG.svg";
                             break;
 
                         case 42:
-                            result.WeatherIMG = "/images/snowIMG.svg";
+                            result.WeatherIMG = "./images/snowIMG.svg";
                             break;
 
                         default:
-                            result.WeatherIMG = "/images/rainIMG.svg";
+                            result.WeatherIMG = "./images/rainIMG.svg";
                             break;
                     }
                 }

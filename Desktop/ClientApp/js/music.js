@@ -37,9 +37,9 @@ class Music extends BaseComponent {
             this.playlistPanel.classList.toggle("closed");
         });
 
-        //this.setEvent(this.addFileBTN, "click", () => {
-
-        //});
+        this.setEvent(this.addFileBTN, "click", () => {
+            alert("施工中><...");
+        });
 
         this.setEvent(this.addYouTubeBTN, "click", () => {
             this.urlDialog.querySelector("input[type=text]").value = "";

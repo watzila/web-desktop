@@ -16,7 +16,7 @@ namespace Desktop.BLL.Service {
                 string sql = "select * from ACLObject where ParentID=@ParentID and Status=1 order by Sort;";
                 var data = connection.Query<ACLObject>(sql, parameters);
                 foreach (var item in data) {
-                    item.Icon = string.IsNullOrWhiteSpace(item.Icon) ? "https://placehold.jp/48x48.png" : $"/images/Icon/{item.Icon}";
+                    item.Icon = string.IsNullOrWhiteSpace(item.Icon) ? "https://placehold.jp/48x48.png" : $"./images/Icon/{item.Icon}";
                 }
                 result.Data = mapper.Map<List<ACLObjectModel.Items>>(data);
             }

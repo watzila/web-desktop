@@ -14,7 +14,7 @@ namespace Desktop.Controllers {
 
             try {
                 MusicModel musicModel = musicService.List();
-                result = new ResultModel<MusicModel>(musicModel, "Music");
+                result = new ResultModel<MusicModel>(musicModel, "music");
             } catch (Exception ex) {
                 result = new ResultModel<MusicModel>(ex);
             }

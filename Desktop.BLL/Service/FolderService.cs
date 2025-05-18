@@ -20,7 +20,7 @@ namespace Desktop.BLL.Service {
                     if (string.IsNullOrWhiteSpace(item.Icon)) {
                         item.DefaultIcon = share.GetDefaultIcon(item.Type);
                     } else {
-                        item.Icon = $"/images/Icon/{item.Icon}";
+                        item.Icon = $"./images/Icon/{item.Icon}";
                     }
                 }
                 result.Data = mapper.Map<List<ACLObjectModel.Items>>(data);

@@ -83,9 +83,6 @@ class Desktop {
     deleteDB() {
         indexedDB.deleteDatabase("DesktopDB").onsuccess = () => {
             this.notificationEvent.push({ title: "IndexedDB", msg: "已刪除" });
-            setTimeout(function () {
-                window.close();
-            }, 1500);
         };
     }
 

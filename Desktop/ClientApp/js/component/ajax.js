@@ -21,7 +21,7 @@ class Ajax {
         }
         //console.log(set);
 
-        if (this.enableOffline) {
+        if (this.enableOffline && /^\/api\/.*/.test(url)) {
             if (!this.db) await this.init();
             const result = await this.db.conn(url, data);
             //console.log(result);
@@ -31,16 +31,18 @@ class Ajax {
 
         const options = {
             method: type,
-            redirect: "follow",
-            headers: {
-                //"X-Requested-With": "XMLHttpRequest"
-            }
+            redirect: "follow"
         };
         if (contentType) {
+            options.headers = {};
             options.headers["Content-Type"] = contentType;
         }
-        if (type == "post" && data && contentType != "application/x-www-form-urlencoded") {
-            options.body = JSON.stringify(data);
+        if (type == "post" && data) {
+            if (data instanceof FormData) {
+                options.body = data;
+            } else {
+                options.body = JSON.stringify(data);
+            }
         } else if (type == "get" && data) {
             url = encodeURI(url + "?" + Object.keys(data).map(k => k + "=" + data[k]).join("&"));
         }

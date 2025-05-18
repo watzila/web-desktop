@@ -24,12 +24,12 @@ class Table extends BaseComponent {
             }
         });
 
-        //this.trEles.forEach(tr => {
-            //this.setEvent(tr, "click", (e) => {
-            //    e.stopPropagation();
-            //    this.choose(e.currentTarget);
-            //});
-        //});
+        this.trEles.forEach(tr => {
+            this.setEvent(tr, "click", (e) => {
+                e.stopPropagation();
+                this.choose(e.currentTarget);
+            });
+        });
     }
 
     /**

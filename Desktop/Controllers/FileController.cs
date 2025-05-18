@@ -22,7 +22,7 @@ namespace Desktop.Controllers {
 
             try {
                 TextModel textModel = fileService.Text(param);
-                result = new ResultModel<TextModel>(textModel, "Text");
+                result = new ResultModel<TextModel>(textModel, "text");
             } catch (Exception ex) {
                 result = new ResultModel<TextModel>(ex);
             }
@@ -31,7 +31,7 @@ namespace Desktop.Controllers {
         }
 
         [HttpPost("SaveText")]
-        public IActionResult SaveText([FromBody] TextParamModel param) {
+        public IActionResult SaveText([FromForm] TextParamModel param) {
             ResultModel<string> result;
 
             try {

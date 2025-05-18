@@ -45,8 +45,11 @@
         };
     }
 
+    /**
+     * 取得資料庫資料
+     */
     getData() {
-        return fetch("../../db.json")
+        return fetch("./db.json")
             .then((res) => res.json())
             .then((json) => json)
             .catch((err) => {
@@ -55,6 +58,9 @@
             });
     }
 
+    /**
+     * 註冊API
+     */
     registerAPI() {
         this.api["/api/Home/DesktopList"] = async () => {
             const db = await this.getDBInstance();
@@ -64,7 +70,7 @@
 
             const result = data.map((item) => ({
                 ...item,
-                icon: !item.icon ? "https://placehold.jp/50x50.png" : `/images/Icon/${item.icon}`
+                icon: !item.icon ? "https://placehold.jp/50x50.png" : `./images/Icon/${item.icon}`
             }));
 
             return {
@@ -75,26 +81,67 @@
             };
         };
 
+        this.api["/api/Home/Weather"] = async (data) => {
+            //console.log(data);
+            const result = {
+                weather: "test",
+                weatherIMG: "./images/sunIMG.svg",
+                temperature:"0"
+            };
+
+            fetch(`https://opendata.cwa.gov.tw/api/v1/rest/datastore/${data.locationId}?Authorization=CWB-422B0FA3-E374-492D-B54A-4D8942BE2B7E&format=JSON&LocationName=${data.locationName}`)
+                .then(response => response.json())
+                .then(res => console.log(res));
+
+            return {
+                returnCode: 200,
+                returnMsg: "success",
+                returnData: result,
+                js: null
+            };
+        };
+
         this.api["/api/Music/List"] = async () => {
             const db = await this.getDBInstance();
             const data = await this.getStore(db, "Music", () => true, {
                 sortBy: "sort"
             });
 
-            const result = data.map((item) => ({
-                ...item
-            }));
-
             return {
                 returnCode: 200,
                 returnMsg: "success",
-                returnData: { data: result },
+                returnData: { data: data },
                 js: "Music"
             };
         };
 
+        this.api["/api/Music/Add"] = async (data) => {
+            const db = await this.getDBInstance();
+            data.id = this.newid();
+            data.sort = (await this.getStore(db, "Music", () => true)).length + 1;
+            this.writeStore(db, "Music", data);
+
+            return {
+                returnCode: 200,
+                returnMsg: "success",
+                returnData: data.id,
+                js: null
+            };
+        };
+
+        this.api["/api/Music/Delete"] = async (data) => {
+            const db = await this.getDBInstance();
+            this.deleteStore(db, "Music", data.id);
+        };
+
     }
 
+    /**
+     * 連線
+     * @param {string} url 連線地址
+     * @param {object} data 要傳送的物件
+     * @returns {Promise<{returnCode:number,returnMsg:string,returnData:object}>}
+     */
     async conn(url, data) {
         if (this.api[url]) {
             return await this.api[url](data);
@@ -108,6 +155,10 @@
         }
     }
 
+    /**
+     * 取得資料庫實體
+     * @returns {Promise<IDBDatabase>}
+     */
     async getDBInstance() {
         return new Promise((resolve, reject) => {
             const req = indexedDB.open("DesktopDB", 1);
@@ -116,6 +167,14 @@
         });
     }
 
+    /**
+     * 取得資料庫資料
+     * @param {IDBDatabase} db
+     * @param {string} storeName
+     * @param {function} filterFn
+     * @param {object} options
+     * @returns {Promise<Array>}
+     */
     getStore(db, storeName, filterFn = () => true, options = {}) {
         return new Promise((resolve, reject) => {
             const tx = db.transaction(storeName, "readonly");
@@ -144,6 +203,51 @@
                 reject(err);
             };
         });
+    }
+
+    /**
+     * 寫入資料
+     * @param {IDBDatabase} db
+     * @param {string} storeName
+     * @param {object} data
+     */
+    writeStore(db, storeName, data) {
+        const req = db.transaction(storeName, "readwrite").objectStore(storeName).add(data);
+        req.onsuccess = () => {
+            //console.log("✅ IndexedDB 寫入成功");
+        };
+        req.onerror = (err) => {
+            //console.error("❌ IndexedDB 寫入錯誤", err);
+            throw new Error(JSON.stringify({ title: "IndexedDB", msg: "✖新增失敗" }));
+        };
+    }
+
+    /**
+     * 刪除資料
+     * @param {IDBDatabase} db
+     * @param {string} storeName
+     * @param {string} id
+     */
+    deleteStore(db, storeName, id) {
+        const req = db.transaction(storeName, "readwrite").objectStore(storeName).delete(id);
+        req.onsuccess = () => {
+            //console.log("✅ IndexedDB 刪除成功");
+        };
+        req.onerror = (err) => {
+            //console.error("❌ IndexedDB 刪除錯誤", err);
+            throw new Error(JSON.stringify({ title: "IndexedDB", msg: "✖刪除失敗" }));
+        };
+    }
+
+    /**創建Guid*/
+    newid() {
+        let d = new Date().getTime();
+        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            let r = (d + Math.random() * 16) % 16 | 0;
+            d = Math.floor(d / 16);
+            return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+        return uuid;
     }
 
 }

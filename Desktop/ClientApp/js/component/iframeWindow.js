@@ -1,7 +1,7 @@
 ﻿import Ajax from "./ajax.js";
 import ClassRegistry from "./classRegistry.js";
 import eventBus from "./eventBus.js";
-import TemplateEngine from "/js/component/TemplateEngine.js";
+import TemplateEngine from "./TemplateEngine.js";
 
 class IframeWindow {
     constructor(set) {
@@ -27,7 +27,7 @@ class IframeWindow {
             this.currentClick.removeAttribute("class");
             this.open(target).then((windowEle) => {
                 windowEle.style.zIndex = this.zIndex;
-                this.zIndex++;
+                this.zIndex+=1;
 
                 this.applyStylesBasedOnWidth(windowEle);
                 this.resizable(windowEle);
@@ -37,10 +37,19 @@ class IframeWindow {
                 this.clickable(windowEle);
 
                 this.go(windowEle);
+
+                this.navSticky();
             });
         };
 
         this.clearChoose();
+    }
+
+    /**
+     * nav置頂
+     */
+    navSticky() {
+        this.work.closest("nav").style.zIndex = this.zIndex;
     }
 
     /**
@@ -67,7 +76,7 @@ class IframeWindow {
         return new Promise((resolve) => {
             if (target) {
                 const title = target.title;
-                const iconPath = target.querySelector(".icon").src;
+                const iconPath = target.querySelector("[data-icon]").src;
                 const data = { title, iconPath, w: target.dataset.w, h: target.dataset.h};
                 Ajax.conn({
                     type: "post", url: target.dataset.href, data: { id: target.dataset.value }, fn: async (res) => {
@@ -75,8 +84,8 @@ class IframeWindow {
 
                         try {
                             //console.log(res);
-                            const layoutHtml = await TemplateEngine.view("/templates/windowLayout.html", data);
-                            const html = await TemplateEngine.view(`${target.dataset.href.replace("api", "templates")}.html`, res.returnData);
+                            const layoutHtml = await TemplateEngine.view("./templates/windowLayout.html", data);
+                            const html = await TemplateEngine.view(`${target.dataset.href.replace("/api", "./templates")}.html`, res.returnData);
                             const randomId = crypto.getRandomValues(new Uint32Array(1))[0];
                             let frag = document.createRange().createContextualFragment(layoutHtml);
                             //console.log(html, frag.firstChild);
@@ -118,8 +127,8 @@ class IframeWindow {
                             console.log(this.allWindows);
 
                             resolve(windowEle);
-                        } catch {
-
+                        } catch (ex) {
+                            //console.log(ex);
                         }
                     }, contentType: "application/json"
                 }).catch(error => {
@@ -170,7 +179,7 @@ class IframeWindow {
             if (this.currentWindow != iframe) {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
-                this.zIndex++;
+                this.zIndex+=1;
             }
 
             const w = this.allWindows.find(a => a.ele == iframe);
@@ -179,6 +188,8 @@ class IframeWindow {
                 w.open = false;
             }
             iframe.classList.toggle("closed");
+
+            this.navSticky();
         };
     }
 
@@ -192,7 +203,7 @@ class IframeWindow {
             if (this.currentWindow != iframe && !iframe.classList.contains("closed")) {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
-                this.zIndex++;
+                this.zIndex+=1;
 
                 this.workingChoose(iframe.id + "BTN");
             } else {
@@ -204,13 +215,15 @@ class IframeWindow {
                     if (this.currentWindow != iframe) {
                         this.currentWindow = iframe;
                         iframe.style.zIndex = this.zIndex;
-                        this.zIndex++;
+                        this.zIndex+=1;
 
                     }
 
                     this.workingChoose(iframe.id + "BTN");
                 }
             }
+
+            this.navSticky();
         };
     }
 
@@ -240,6 +253,8 @@ class IframeWindow {
 
                 window.addEventListener("mousemove", move);
                 window.addEventListener("mouseup", stopMove);
+
+                that.navSticky();
             });
 
         function move(e) {
@@ -262,7 +277,7 @@ class IframeWindow {
             if (this.currentWindow != iframe) {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
-                this.zIndex++;
+                this.zIndex+=1;
 
                 this.workingChoose(iframe.id + "BTN");
             }
@@ -283,8 +298,14 @@ class IframeWindow {
         //console.log(obj, iframe);
     }
 
+    /**
+     * 跳轉頁面事件
+     * @param {Object} e 事件
+     * @param {Element} mainEle 視窗主要內容元素
+     * @param {Element} obj 視窗元素
+     */
     handleEvent(e, mainEle, obj) {
-        const item = e.target.closest("button") || e.target.closest(".button");
+        const item = e.target.closest(".click");
         if (!item) return;
         e.stopPropagation();
         //e.preventDefault();
@@ -302,9 +323,29 @@ class IframeWindow {
         }
     }
 
+    /**
+     * 跳轉頁面點擊
+     * @param {Element} item 功能按鈕元素
+     * @param {Element} mainEle 視窗主要內容元素
+     * @param {Element} obj 視窗元素
+     */
     handleClick(item, mainEle, obj) {
         if (obj.type != item.dataset.type) {
-            this.open(item);
+            this.open(item).then((windowEle) => {
+                windowEle.style.zIndex = this.zIndex;
+                this.zIndex+=1;
+
+                this.applyStylesBasedOnWidth(windowEle);
+                this.resizable(windowEle);
+                this.closeable(windowEle);
+                this.smallable(windowEle);
+                this.moveable(windowEle);
+                this.clickable(windowEle);
+
+                this.go(windowEle);
+
+                this.navSticky();
+            });
             return;
         }
 
@@ -314,7 +355,7 @@ class IframeWindow {
             type: "post", url: item.dataset.href, data: data, fn: async (res) => {
                 if (!res) return;
                 //console.log(res)
-                const html = await TemplateEngine.view(`${item.dataset.href.replace("api", "templates")}.html`, res.returnData);
+                const html = await TemplateEngine.view(`${item.dataset.href.replace("/api", "./templates")}.html`, res.returnData);
                 const headerEle = obj.ele.querySelector("header>.title h4");
                 const windowIconEle = obj.ele.querySelector("header>.windowIcon");
                 windowIconEle.innerHTML = item.querySelector("[data-icon]").outerHTML
