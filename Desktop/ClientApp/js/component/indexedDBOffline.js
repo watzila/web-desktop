@@ -111,7 +111,7 @@
                 returnCode: 200,
                 returnMsg: "success",
                 returnData: { data: data },
-                js: "Music"
+                js: "music"
             };
         };
 
