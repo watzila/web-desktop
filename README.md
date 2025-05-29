@@ -74,7 +74,7 @@ static enableOffline = true;
 
 ## 🧾 授權 License
 
-本專案採用 [Apache-2.0](LICENSE) 授權。歡迎自由使用、學習與改作，但請遵守相關授權條款。
+本專案採用 [Apache-2.0](./LICENSE.txt) 授權。歡迎自由使用、學習與改作，但請遵守相關授權條款。
 
 ---
 
