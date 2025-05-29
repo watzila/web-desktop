@@ -27,7 +27,7 @@ class IframeWindow {
             this.currentClick.removeAttribute("class");
             this.open(target).then((windowEle) => {
                 windowEle.style.zIndex = this.zIndex;
-                this.zIndex+=1;
+                this.zIndex += 1;
 
                 this.applyStylesBasedOnWidth(windowEle);
                 this.resizable(windowEle);
@@ -77,10 +77,14 @@ class IframeWindow {
             if (target) {
                 const title = target.title;
                 const iconPath = target.querySelector("[data-icon]").src;
-                const data = { title, iconPath, w: target.dataset.w, h: target.dataset.h};
+                const data = { title, iconPath, w: target.dataset.w, h: target.dataset.h };
                 Ajax.conn({
                     type: "post", url: target.dataset.href, data: { id: target.dataset.value }, fn: async (res) => {
                         if (!res) return;
+                        if (res.returnCode != 200) {
+                            eventBus.emit("error", JSON.stringify({ title: title, msg: res.returnMsg }));
+                            return;
+                        }
 
                         try {
                             //console.log(res);
@@ -131,9 +135,7 @@ class IframeWindow {
                             //console.log(ex);
                         }
                     }, contentType: "application/json"
-                }).catch(error => {
-                    eventBus.emit("error", error.message);
-                });
+                }).catch(error => eventBus.emit("error", JSON.stringify({ title: title, msg: error.message })));
             }
         });
     }
@@ -179,7 +181,7 @@ class IframeWindow {
             if (this.currentWindow != iframe) {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
-                this.zIndex+=1;
+                this.zIndex += 1;
             }
 
             const w = this.allWindows.find(a => a.ele == iframe);
@@ -203,7 +205,7 @@ class IframeWindow {
             if (this.currentWindow != iframe && !iframe.classList.contains("closed")) {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
-                this.zIndex+=1;
+                this.zIndex += 1;
 
                 this.workingChoose(iframe.id + "BTN");
             } else {
@@ -215,7 +217,7 @@ class IframeWindow {
                     if (this.currentWindow != iframe) {
                         this.currentWindow = iframe;
                         iframe.style.zIndex = this.zIndex;
-                        this.zIndex+=1;
+                        this.zIndex += 1;
 
                     }
 
@@ -277,7 +279,7 @@ class IframeWindow {
             if (this.currentWindow != iframe) {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
-                this.zIndex+=1;
+                this.zIndex += 1;
 
                 this.workingChoose(iframe.id + "BTN");
             }
@@ -333,7 +335,7 @@ class IframeWindow {
         if (obj.type != item.dataset.type) {
             this.open(item).then((windowEle) => {
                 windowEle.style.zIndex = this.zIndex;
-                this.zIndex+=1;
+                this.zIndex += 1;
 
                 this.applyStylesBasedOnWidth(windowEle);
                 this.resizable(windowEle);
@@ -354,6 +356,10 @@ class IframeWindow {
         Ajax.conn({
             type: "post", url: item.dataset.href, data: data, fn: async (res) => {
                 if (!res) return;
+                if (res.returnCode != 200) {
+                    eventBus.emit("error", JSON.stringify({ title: item.title, msg: res.returnMsg }));
+                    return;
+                }
                 //console.log(res)
                 const html = await TemplateEngine.view(`${item.dataset.href.replace("/api", "./templates")}.html`, res.returnData);
                 const headerEle = obj.ele.querySelector("header>.title h4");
@@ -371,9 +377,7 @@ class IframeWindow {
 
                 this.go(obj.ele);
             }, contentType: "application/json"
-        }).catch(error => {
-            eventBus.emit("error", error.message);
-        });
+        }).catch(error => eventBus.emit("error", JSON.stringify({ title: item.title, msg: error.message })));
     }
 
     /**

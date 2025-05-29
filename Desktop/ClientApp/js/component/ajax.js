@@ -53,7 +53,7 @@ class Ajax {
                 if (response.ok) {
                     return response.json();
                 } else {
-                    throw new Error(JSON.stringify({ title: response.url, msg: "✖找不到此頁面" }));
+                    throw new Error("✖找不到此頁面");
                 }
             })
             .then(result => fn(result));

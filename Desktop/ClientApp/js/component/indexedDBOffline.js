@@ -1,4 +1,6 @@
-﻿class IndexedDBOffline {
+﻿import homeApi from "../api/Home.js";
+import musicApi from "../api/Music.js";
+class IndexedDBOffline {
     constructor() {
         this.api = {};
         this._initialized = false;
@@ -62,78 +64,12 @@
      * 註冊API
      */
     registerAPI() {
-        this.api["/api/Home/DesktopList"] = async () => {
-            const db = await this.getDBInstance();
-            const data = await this.getStore(db, "ACLObject", (item) => item.status == 1 && item.inDesktop == 1, {
-                sortBy: "sort"
-            });
-
-            const result = data.map((item) => ({
-                ...item,
-                icon: !item.icon ? "https://placehold.jp/50x50.png" : `./images/Icon/${item.icon}`
-            }));
-
-            return {
-                returnCode: 200,
-                returnMsg: "success",
-                returnData: { data: result },
-                js: null
-            };
-        };
-
-        this.api["/api/Home/Weather"] = async (data) => {
-            //console.log(data);
-            const result = {
-                weather: "test",
-                weatherIMG: "./images/sunIMG.svg",
-                temperature:"0"
-            };
-
-            fetch(`https://opendata.cwa.gov.tw/api/v1/rest/datastore/${data.locationId}?Authorization=CWB-422B0FA3-E374-492D-B54A-4D8942BE2B7E&format=JSON&LocationName=${data.locationName}`)
-                .then(response => response.json())
-                .then(res => console.log(res));
-
-            return {
-                returnCode: 200,
-                returnMsg: "success",
-                returnData: result,
-                js: null
-            };
-        };
-
-        this.api["/api/Music/List"] = async () => {
-            const db = await this.getDBInstance();
-            const data = await this.getStore(db, "Music", () => true, {
-                sortBy: "sort"
-            });
-
-            return {
-                returnCode: 200,
-                returnMsg: "success",
-                returnData: { data: data },
-                js: "music"
-            };
-        };
-
-        this.api["/api/Music/Add"] = async (data) => {
-            const db = await this.getDBInstance();
-            data.id = this.newid();
-            data.sort = (await this.getStore(db, "Music", () => true)).length + 1;
-            this.writeStore(db, "Music", data);
-
-            return {
-                returnCode: 200,
-                returnMsg: "success",
-                returnData: data.id,
-                js: null
-            };
-        };
-
-        this.api["/api/Music/Delete"] = async (data) => {
-            const db = await this.getDBInstance();
-            this.deleteStore(db, "Music", data.id);
-        };
-
+        const apiList = [homeApi, musicApi];
+        apiList.forEach(api => {
+            for (const [url, handler] of Object.entries(api)) {
+                this.api[url] = async (data) => handler(this, data);
+            }
+        });
     }
 
     /**
@@ -148,8 +84,8 @@
         }
 
         return {
-            returnCode: 200,
-            returnMsg: "success",
+            returnCode: 404,
+            returnMsg: "✖找不到此頁面",
             returnData: null,
             js: null
         }
