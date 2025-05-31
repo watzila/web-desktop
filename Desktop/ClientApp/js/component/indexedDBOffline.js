@@ -1,5 +1,6 @@
 ﻿import homeApi from "../api/Home.js";
 import musicApi from "../api/Music.js";
+import aquariumApi from "../api/Aquarium.js";
 class IndexedDBOffline {
     constructor() {
         this.api = {};
@@ -64,7 +65,7 @@ class IndexedDBOffline {
      * 註冊API
      */
     registerAPI() {
-        const apiList = [homeApi, musicApi];
+        const apiList = [homeApi, musicApi, aquariumApi];
         apiList.forEach(api => {
             for (const [url, handler] of Object.entries(api)) {
                 this.api[url] = async (data) => handler(this, data);
