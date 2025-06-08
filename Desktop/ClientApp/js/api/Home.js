@@ -7,7 +7,11 @@
 
         const result = data.map((item) => ({
             ...item,
-            icon: !item.icon ? "https://placehold.jp/50x50.png" : `./images/Icon/${item.icon}`
+            icon: !item.icon ? "https://placehold.jp/50x50.png" : `./images/Icon/${item.icon}`,
+            x: item.pos ? item.pos.split(",")[0] : null,
+            y: item.pos ? item.pos.split(",")[1] : null,
+            w: item.pos ? item.pos.split(",")[2] : null,
+            h: item.pos ? item.pos.split(",")[3] : null,
         }));
 
         return {

@@ -1,4 +1,5 @@
-﻿<div class="defaultWindow" data-class="{{ js}}" style="--w:{{#if w}}{{w}}{{#else}}900{{/if}};--h:{{#if h}}{{h}}{{#else}}600{{/if}}">
+﻿<div class="defaultWindow" data-class="{{ js}}"
+     style="--w:{{#if w}}{{w}}{{#else}}900{{/if}};--h:{{#if h}}{{h}}{{#else}}600{{/if}}">
     <div class='resizer topLeft'></div>
     <div class='resizer topRight'></div>
     <div class='resizer bottomLeft'></div>
@@ -13,7 +14,7 @@
         </div>
         <aside>
             <button class="icon" title="最小化" id="smallWindow"><b>&#128469;</b></button>
-            <button class="icon" title="縮放"><b>&#128470;</b></button>
+            <button class="icon" title="縮放" id="bigWindow"><b>&#128470;</b></button>
             <button class="icon" title="關閉" id="closeWindow"><b>&#128473;</b></button>
         </aside>
     </header>

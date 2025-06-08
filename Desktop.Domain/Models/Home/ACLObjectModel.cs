@@ -15,6 +15,11 @@
             public string UpdateDate { get; set; }
             public double? Width { get; set; }
             public double? Height { get; set; }
+            public string Pos { get; set; }//位置
+            public int? X { get; set; }
+            public int? Y { get; set; }
+            public int? H { get; set; }
+            public int? W { get; set; }
             public bool IsCurrent { get; set; }
         }
 

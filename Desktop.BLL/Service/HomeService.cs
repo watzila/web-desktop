@@ -14,11 +14,20 @@ namespace Desktop.BLL.Service {
             using (var connection = unitOfWork.CreateConnection()) {
                 string sql = "select * from ACLObject where Status=1 and InDesktop=1 order by Sort;";
                 var data = connection.Query<ACLObject>(sql);
-                var aa = JsonConvert.SerializeObject(data);
                 foreach (var item in data) {
                     item.Icon = string.IsNullOrWhiteSpace(item.Icon) ? "https://placehold.jp/50x50.png" : $"./images/Icon/{item.Icon}";
                 }
                 result.Data = mapper.Map<List<ACLObjectModel.Items>>(data);
+            }
+
+            foreach(var item in result.Data) {
+                if(!string.IsNullOrWhiteSpace(item.Pos)) {
+                    string[] pos = item.Pos.Split(',');
+                    item.X = int.TryParse(pos[0], out int x) ? x : 0;
+                    item.Y = int.TryParse(pos[1], out int y) ? y : 0;
+                    item.W = int.TryParse(pos[2], out int w) ? w : 0;
+                    item.H = int.TryParse(pos[3], out int h) ? h : 0;
+                }
             }
 
             return result;

@@ -1,242 +1,256 @@
 ﻿.fillWindow {
-    width: 100vw !important;
-    height: 100vh !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  top: 0 !important;
+  left: 0 !important;
 }
 
 .defaultWindow {
-    position: absolute;
-    display: grid;
-    grid-template-rows: 35px auto;
-    width: calc(var(--w)*1px);
-    height: calc(var(--h)*1px);
-    border: 1px solid;
-    border-radius: 5px;
-    box-shadow: 5px 5px 8px rgb(0 0 0 / 15%), -5px -5px 8px rgb(0 0 0 / 15%);
+  position: absolute;
+  display: grid;
+  grid-template-rows: 35px auto;
+  width: calc(var(--w)*1px);
+  height: calc(var(--h)*1px);
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  border: 2px dashed #aaa;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-:is(.defaultWindow, .fillWindow) > .iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    border-radius: 0 0 5px 5px;
-    background-color: #fff;
-    overflow: auto;
+.defaultWindow.dragging:not(.fillWindow) {
+  transform: scale(1.03) rotate(0.5deg);
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
-:is(.defaultWindow, .fillWindow) header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #eee;
-    border-radius: 5px 5px 0 0;
-    user-select: none;
+:is(.defaultWindow, .fillWindow)>.iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0 0 5px 5px;
+  background-color: #ffffff;
+  border-radius: 0 0 16px 16px;
+  overflow: auto;
+}
+
+:is(.defaultWindow, .fillWindow)>header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #eee;
+  border-radius: 16px 16px 0 0;
+  user-select: none;
 }
 
 :is(.defaultWindow, .fillWindow) .title {
-    flex: 1 1 100%;
-    display: flex;
-    height: 100%;
-    align-items: center;
-    padding: 0 5px;
-    font-weight: normal;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: default;
+  flex: 1 1 100%;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  padding: 0 5px;
+  font-weight: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
 }
 
 :is(.defaultWindow, .fillWindow) header aside {
-    display: flex;
+  display: flex;
 }
 
 :is(.defaultWindow, .fillWindow) header .icon {
-    padding: 8px;
-    font-size: 1.2rem;
-    line-height: 1.2rem;
+  padding: 8px;
+  font-size: 1.2rem;
+  line-height: 1.2rem;
 }
 
-    :is(.defaultWindow, .fillWindow) header .icon:hover {
-        background-color: #80bdbf;
-    }
+:is(.defaultWindow, .fillWindow) header .icon#closeWindow {
+  border-radius: 0 16px 0 0;
+}
 
-    :is(.defaultWindow, .fillWindow) header .icon#closeWindow:hover {
-        background-color: red;
-        color: #fff;
-    }
+:is(.defaultWindow, .fillWindow) header .icon:hover {
+  background-color: #80bdbf;
+}
+
+:is(.defaultWindow, .fillWindow) header .icon#closeWindow:hover {
+  background-color: red;
+  color: #fff;
+}
 
 .windowIcon {
-    flex: 0 0 auto;
-    padding: 5px;
+  flex: 0 0 auto;
+  padding: 5px;
 }
 
-    .windowIcon > img {
-        max-width: 24px;
-        max-height: 24px;
-    }
+.windowIcon>img {
+  max-width: 24px;
+  max-height: 24px;
+}
 
 .round {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .resizer {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: transparent;
-    /*border: 3px solid #4286f4;*/
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: transparent;
+  /*border: 3px solid #4286f4;*/
 }
 
-    .resizer.topLeft {
-        left: -5px;
-        top: -5px;
-        cursor: nwse-resize;
-    }
+.resizer.topLeft {
+  left: -5px;
+  top: -5px;
+  cursor: nwse-resize;
+}
 
-    .resizer.topRight {
-        right: -5px;
-        top: -5px;
-        cursor: nesw-resize;
-    }
+.resizer.topRight {
+  right: -5px;
+  top: -5px;
+  cursor: nesw-resize;
+}
 
-    .resizer.bottomLeft {
-        left: -5px;
-        bottom: -5px;
-        cursor: nesw-resize;
-    }
+.resizer.bottomLeft {
+  left: -5px;
+  bottom: -5px;
+  cursor: nesw-resize;
+}
 
-    .resizer.bottomRight {
-        right: -5px;
-        bottom: -5px;
-        cursor: nwse-resize;
-    }
+.resizer.bottomRight {
+  right: -5px;
+  bottom: -5px;
+  cursor: nwse-resize;
+}
 
 .function {
-    flex-grow: 0;
-    flex-shrink: 0;
-    padding: 10px;
-    cursor: pointer;
+  flex-grow: 0;
+  flex-shrink: 0;
+  padding: 10px;
+  cursor: pointer;
 }
 
-    .function > button {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        min-height: 90px;
-        padding: 15px;
-        text-align: start;
-    }
+.function>button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 90px;
+  padding: 15px;
+  text-align: start;
+}
 
-        .function > button div:first-child,
-        .iframe nav > div:first-child {
-            flex-grow: 0;
-            flex-shrink: 0;
-            margin-right: 10px;
-        }
+.function>button div:first-child,
+.iframe nav>div:first-child {
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
 
-    .function:hover > button {
-        outline: 2px solid #eee;
-    }
+.function:hover>button {
+  outline: 2px solid #eee;
+}
 
 .fill100 {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 textarea {
-    font-size: var(--size);
+  font-size: var(--size);
 }
 
 .appLayout {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
 }
 
-    /* nav 頂部欄 */
-    .appLayout .nav {
-        display: flex;
-        align-items: center;
-        min-height: 1.8rem;
-        border-bottom: 1px solid #ddd;
-    }
+/* nav 頂部欄 */
+.appLayout .nav {
+  display: flex;
+  align-items: center;
+  min-height: 1.8rem;
+  border-bottom: 1px solid #ddd;
+}
 
 .nav menu {
-    display: flex;
-    height: 100%;
+  display: flex;
+  height: 100%;
 }
 
 .menu-item {
-    position: relative;
-    height: 100%;
-    padding: 5px 10px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    user-select: none;
+  position: relative;
+  height: 100%;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
 }
 
-    .menu-item:hover {
-        background-color: #ddd;
-    }
+.menu-item:hover {
+  background-color: #ddd;
+}
 
-        .menu-item:hover .dropdown {
-            display: block;
-        }
+.menu-item:hover .dropdown {
+  display: block;
+}
 
-    .menu-item .dropdown {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        min-width: 100px;
-        background-color: #fff;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border: 1px solid #ccc;
-    }
+.menu-item .dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 100px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ccc;
+}
 
-        .menu-item .dropdown li button {
-            display: block;
-            width: 100%;
-            padding: 5px 10px;
-            text-align: start;
-        }
+.menu-item .dropdown li button {
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  text-align: start;
+}
 
-            .menu-item .dropdown li button:hover {
-                background-color: #eee;
-            }
+.menu-item .dropdown li button:hover {
+  background-color: #eee;
+}
 
 /* 中間區域 */
 .appLayout .mainArea {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
 }
 
 /* 側邊選單 */
 .appLayout .slider {
-    width: 200px;
-    background-color: #f4f4f4;
-    overflow-y: auto;
+  width: 200px;
+  background-color: #f4f4f4;
+  overflow-y: auto;
 }
 
 /* 主內容區域 */
 .appLayout .content {
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
 }
 
 /* 控制是否顯示 nav/slider 的 class（預設都有） */
 .appLayout:not(.show-nav) .nav {
-    display: none;
+  display: none;
 }
 
 .appLayout:not(.show-slider) .slider {
-    display: none;
+  display: none;
 }
 
 .appLayout:not(.show-slider) .content {
-    flex: 1;
-    width: 100%;
+  flex: 1;
+  width: 100%;
 }

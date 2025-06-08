@@ -17,7 +17,7 @@ class Aquarium extends BaseComponent {
     }
 
     init() {
-        this.fishImg.src = '../images/fish1.png';
+        this.fishImg.src = './images/fish1.png';
         // 初始魚
         for (let i = 0; i < 3; i++) {
             this.fishes.push(new Fish(100 + i * 200, 100 + Math.random() * 100));

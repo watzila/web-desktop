@@ -15,5 +15,6 @@
         public DateTime UpdateDate { get; set; }
         public double? Width { get; set; }
         public double? Height { get; set; }
+        public string Pos { get; set; }//位置
     }
 }

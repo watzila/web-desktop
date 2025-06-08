@@ -15,6 +15,9 @@ class IframeWindow {
     }
 
     init(target) {
+        if (!target.dataset.click) {
+            return;
+        }
         target.onclick = (e) => {
             e.stopPropagation();
             //e.preventDefault();
@@ -24,7 +27,7 @@ class IframeWindow {
         target.ondblclick = (e) => {
             e.stopPropagation();
             //e.preventDefault();
-            this.currentClick.removeAttribute("class");
+            this.currentClick.classList.remove("click");
             this.open(target).then((windowEle) => {
                 windowEle.style.zIndex = this.zIndex;
                 this.zIndex += 1;
@@ -32,6 +35,7 @@ class IframeWindow {
                 this.applyStylesBasedOnWidth(windowEle);
                 this.resizable(windowEle);
                 this.closeable(windowEle);
+                this.bigable(windowEle);
                 this.smallable(windowEle);
                 this.moveable(windowEle);
                 this.clickable(windowEle);
@@ -49,7 +53,7 @@ class IframeWindow {
      * nav置頂
      */
     navSticky() {
-        this.work.closest("nav").style.zIndex = this.zIndex;
+        this.work.style.zIndex = this.zIndex;
     }
 
     /**
@@ -58,11 +62,11 @@ class IframeWindow {
      */
     choose(target) {
         if (this.currentClick) {
-            this.currentClick.removeAttribute("class");
+            this.currentClick.classList.remove("click");
             this.currentClick = null;
         }
         if (target) {
-            target.className = "click";
+            target.classList.add("click");
             this.currentClick = target;
         }
     }
@@ -76,7 +80,7 @@ class IframeWindow {
         return new Promise((resolve) => {
             if (target) {
                 const title = target.title;
-                const iconPath = target.querySelector("[data-icon]").src;
+                const iconPath = target.querySelector("[data-icon]")?.src || "";
                 const data = { title, iconPath, w: target.dataset.w, h: target.dataset.h };
                 Ajax.conn({
                     type: "post", url: target.dataset.href, data: { id: target.dataset.value }, fn: async (res) => {
@@ -103,7 +107,7 @@ class IframeWindow {
                             this.desktop.appendChild(frag.firstChild);
 
                             const windowEle = document.querySelector("#f" + randomId);
-                            let frag2 = document.createRange().createContextualFragment(`<button class="working" id="f${randomId}BTN"><img src="${windowEle.querySelector(".windowIcon>img").src}" /></button>`);
+                            let frag2 = document.createRange().createContextualFragment(`<button class="noUserSelect working closed softQ" id="f${randomId}BTN"><img src="${windowEle.querySelector(".windowIcon>img").src}" /></button>`);
                             this.work.appendChild(frag2.firstChild);
                             this.currentWindow = windowEle;
                             this.allWindows.push({
@@ -118,7 +122,6 @@ class IframeWindow {
                                 historyIndex: 1,
                                 mainClasses: []
                             });
-                            this.workingChoose("f" + randomId + "BTN");
                             this.clickBTNable(windowEle);
 
                             ClassRegistry.loadClass(windowEle.dataset.class).then(m => {
@@ -144,7 +147,7 @@ class IframeWindow {
     clearChoose() {
         document.addEventListener("click", () => {
             if (this.currentClick) {
-                this.currentClick.removeAttribute("class");
+                this.currentClick.classList.remove("click");
                 this.currentClick = null;
             }
         });
@@ -172,6 +175,25 @@ class IframeWindow {
     }
 
     /**
+     * 放大視窗按鈕
+     * @param {Element} iframe 視窗元素
+     */
+    bigable(iframe) {
+        iframe.querySelector("#bigWindow").onclick = (e) => {
+            e.stopPropagation();
+            if (this.currentWindow != iframe) {
+                this.currentWindow = iframe;
+                iframe.style.zIndex = this.zIndex;
+                this.zIndex += 1;
+            }
+
+            iframe.classList.toggle("fillWindow");
+
+            this.navSticky();
+        };
+    }
+
+    /**
      * 縮小視窗按鈕
      * @param {Element} iframe 視窗元素
      */
@@ -186,10 +208,10 @@ class IframeWindow {
 
             const w = this.allWindows.find(a => a.ele == iframe);
             if (w) {
-                w.btn.removeAttribute("style");
+                w.btn.classList.remove("closed");
                 w.open = false;
             }
-            iframe.classList.toggle("closed");
+            iframe.classList.add("closed");
 
             this.navSticky();
         };
@@ -200,33 +222,104 @@ class IframeWindow {
      * @param {Element} iframe 視窗元素
      */
     clickBTNable(iframe) {
-        document.querySelector("#" + iframe.id + "BTN").onclick = (e) => {
+        const w = this.allWindows.find(a => a.ele == iframe);
+
+        this.moveBTNable(w.btn);
+
+        w.btn.onclick = (e) => {
             e.stopPropagation();
+            if (e.currentTarget.isDragging) {
+                e.currentTarget.isDragging = false;
+                return;
+            }
             if (this.currentWindow != iframe && !iframe.classList.contains("closed")) {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
                 this.zIndex += 1;
-
-                this.workingChoose(iframe.id + "BTN");
             } else {
-                iframe.classList.toggle("closed");
-                if (iframe.classList.contains("closed")) {
-                    this.currentWindow = null;
-                    this.workingChoose("");
-                } else {
-                    if (this.currentWindow != iframe) {
-                        this.currentWindow = iframe;
-                        iframe.style.zIndex = this.zIndex;
-                        this.zIndex += 1;
+                iframe.classList.remove("closed");
+                if (this.currentWindow != iframe) {
+                    this.currentWindow = iframe;
+                    iframe.style.zIndex = this.zIndex;
+                    this.zIndex += 1;
 
-                    }
-
-                    this.workingChoose(iframe.id + "BTN");
                 }
+                w.open = true;
+                e.currentTarget.classList.add("closed");
             }
 
             this.navSticky();
         };
+    }
+
+    /**
+     * 工作列視窗按鈕拖曳
+     * @param {Element} ele 工作列視窗按鈕元素
+     */
+    moveBTNable(ele) {
+        const that = this;
+        let isClick = true;
+        let boxLeft = 0;
+        let boxTop = 0;
+
+        ele.onmousedown = function (e) {
+            if (isClick) {
+                isClick = false;
+                this.classList.remove("softQ");
+            }
+
+            boxLeft = e.clientX - this.getBoundingClientRect().left;
+            boxTop = e.clientY - this.getBoundingClientRect().top;
+
+            window.addEventListener("mousemove", move);
+            window.addEventListener("mouseup", stopMove);
+        };
+
+        function move(e) {
+            ele.isDragging = true;
+            ele.style.top = e.clientY - boxTop + "px";
+            ele.style.left = e.clientX - boxLeft + "px";
+        }
+
+        function stopMove() {
+            isClick = true;
+            that.adsorption(ele);
+            ele.classList.add("softQ");
+            window.removeEventListener("mousemove", move);
+            window.removeEventListener("mouseup", stopMove);
+        }
+    }
+
+    /**
+     * 工作列視窗按鈕自動吸附到最近邊緣
+     * @param {Element} ele 工作列視窗按鈕元素
+     */
+    adsorption(ele) {
+        const { innerWidth, innerHeight } = window;
+        const rect = ele.getBoundingClientRect();
+
+        const toLeft = rect.left;
+        const toRight = innerWidth - rect.right;
+        const toTop = rect.top;
+        const toBottom = innerHeight - rect.bottom;
+
+        const minH = Math.min(toLeft, toRight);
+        const minV = Math.min(toTop, toBottom);
+
+        let finalLeft = rect.left;
+        let finalTop = rect.top;
+
+        if (minH < minV) {
+            // 吸附左或右
+            finalLeft = toLeft < toRight ? 0 : innerWidth - rect.width;
+        } else {
+            // 吸附上或下
+            finalTop = toTop < toBottom ? 0 : innerHeight - rect.height;
+        }
+
+        // 設定位置（使用 style，保留動畫）
+        ele.style.left = `${finalLeft}px`;
+        ele.style.top = `${finalTop}px`;
     }
 
     /**
@@ -246,12 +339,11 @@ class IframeWindow {
                     iframe.style.zIndex = that.zIndex;
                     that.zIndex++;
                     isClick = false;
-
-                    that.workingChoose(iframe.id + "BTN");
                 }
 
                 boxLeft = e.clientX - this.parentNode.getBoundingClientRect().left;
                 boxTop = e.clientY - this.parentNode.getBoundingClientRect().top;
+                iframe.classList.toggle("dragging");
 
                 window.addEventListener("mousemove", move);
                 window.addEventListener("mouseup", stopMove);
@@ -265,8 +357,10 @@ class IframeWindow {
         }
 
         function stopMove() {
-            window.removeEventListener("mousemove", move);
             isClick = true;
+            iframe.classList.toggle("dragging");
+            window.removeEventListener("mousemove", move);
+            window.removeEventListener("mouseup", stopMove);
         }
     }
 
@@ -280,8 +374,6 @@ class IframeWindow {
                 this.currentWindow = iframe;
                 iframe.style.zIndex = this.zIndex;
                 this.zIndex += 1;
-
-                this.workingChoose(iframe.id + "BTN");
             }
         });
     }
@@ -340,6 +432,7 @@ class IframeWindow {
                 this.applyStylesBasedOnWidth(windowEle);
                 this.resizable(windowEle);
                 this.closeable(windowEle);
+                this.bigable(windowEle);
                 this.smallable(windowEle);
                 this.moveable(windowEle);
                 this.clickable(windowEle);
@@ -378,22 +471,6 @@ class IframeWindow {
                 this.go(obj.ele);
             }, contentType: "application/json"
         }).catch(error => eventBus.emit("error", JSON.stringify({ title: item.title, msg: error.message })));
-    }
-
-    /**
-     * 工作列視窗按鈕選擇
-     * @param {string} id 當前視窗按鈕id
-     */
-    workingChoose(id) {
-        this.allWindows.forEach(a => {
-            if (a.btn.id != id) {
-                a.btn.removeAttribute("style");
-                a.open = false;
-            } else {
-                a.btn.style = "--c:#11f3c9";
-                a.open = true;
-            }
-        });
     }
 
     /**
