@@ -107,7 +107,7 @@ class IframeWindow {
                             this.desktop.appendChild(frag.firstChild);
 
                             const windowEle = document.querySelector("#f" + randomId);
-                            let frag2 = document.createRange().createContextualFragment(`<button class="noUserSelect working closed softQ" id="f${randomId}BTN"><img src="${windowEle.querySelector(".windowIcon>img").src}" /></button>`);
+                            let frag2 = document.createRange().createContextualFragment(`<button class="noUserSelect working closed softQ" id="f${randomId}BTN" title="${title}"><img src="${windowEle.querySelector(".windowIcon>img").src}" /></button>`);
                             this.work.appendChild(frag2.firstChild);
                             this.currentWindow = windowEle;
                             this.allWindows.push({
@@ -228,6 +228,7 @@ class IframeWindow {
 
         w.btn.onclick = (e) => {
             e.stopPropagation();
+            console.log(e.currentTarget.isDragging)
             if (e.currentTarget.isDragging) {
                 e.currentTarget.isDragging = false;
                 return;
@@ -259,8 +260,10 @@ class IframeWindow {
     moveBTNable(ele) {
         const that = this;
         let isClick = true;
-        let boxLeft = 0;
-        let boxTop = 0;
+        let offsetX = 0;
+        let offsetY = 0;
+        let startX = 0;
+        let startY = 0;
 
         ele.onmousedown = function (e) {
             if (isClick) {
@@ -268,17 +271,29 @@ class IframeWindow {
                 this.classList.remove("softQ");
             }
 
-            boxLeft = e.clientX - this.getBoundingClientRect().left;
-            boxTop = e.clientY - this.getBoundingClientRect().top;
+            const rect = this.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+
+            startX = e.clientX;
+            startY = e.clientY;
+            ele.isDragging = false;
 
             window.addEventListener("mousemove", move);
             window.addEventListener("mouseup", stopMove);
         };
 
         function move(e) {
-            ele.isDragging = true;
-            ele.style.top = e.clientY - boxTop + "px";
-            ele.style.left = e.clientX - boxLeft + "px";
+            let deltaX = e.clientX - startX;
+            let deltaY = e.clientY - startY;
+            let distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+
+            if (distance > 10) {
+                ele.isDragging = true;
+            }
+
+            ele.style.top = e.clientY - offsetY + "px";
+            ele.style.left = e.clientX - offsetX + "px";
         }
 
         function stopMove() {
