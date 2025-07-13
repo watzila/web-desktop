@@ -179,6 +179,24 @@
       "width": 900,
       "height": 600,
       "pos": null
+    },
+    {
+      "id": "f642b01e-e219-440e-b196-580a57549f17",
+      "parentID": null,
+      "name": "策略分析",
+      "directions": null,
+      "executeURL": "/api/Twse/Index",
+      "type": 1,
+      "icon": "twse.png",
+      "status": true,
+      "inDesktop": true,
+      "isSystem": false,
+      "sort": 4,
+      "createDate": "2025-07-12T12:13:41.407",
+      "updateDate": "2025-07-12T12:13:41.407",
+      "width": 700,
+      "height": 600,
+      "pos": "1,1,4,4"
     }
   ],
   "Music": [

@@ -14,6 +14,7 @@ namespace Desktop.BLL {
             services.AddScoped<IFolderService, FolderService>();
             services.AddScoped<ISettingService, SettingService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<ITwseService, TwseService>();
 
             return services;
         }

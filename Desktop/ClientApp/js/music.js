@@ -229,6 +229,9 @@ class Music extends BaseComponent {
                 clearInterval(this.updateInterval);
                 this.timeSlider.value = this.duration;
                 this.currentTimeText.innerText = this.durationText;
+                this.playStatus = false;
+                this.playBTN.innerText = "▶️";
+                this.playBTN.title = "播放";
                 break;
 
             case YT.PlayerState.PLAYING:
