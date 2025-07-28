@@ -1,0 +1,476 @@
+/* 股票分析頁面樣式 - 簡約手帳筆記風格 */
+
+.analysis-content {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #faf9f7;
+    min-height: 100vh;
+    font-family: "Patrick Hand", cursive;
+}
+
+/* 筆記卡片樣式 */
+.notebook-card {
+    background: #fff;
+    border: 1px solid #d4c5b9;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+/* 手帳線條裝飾 */
+.notebook-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10px;
+    width: 2px;
+    height: 100%;
+    background: #e8ddd4;
+}
+
+.card-header {
+    padding: 8px 10px 8px 20px;
+    border-bottom: 1px solid #e8ddd4;
+    background: #f8f6f3;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #5d4e37;
+}
+
+.card-body {
+    padding: 10px 10px 10px 20px;
+}
+
+/* 搜尋區域 */
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.input-group label {
+    font-weight: 500;
+    color: #5d4e37;
+    min-width: 80px;
+}
+
+.input-group input {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px 12px;
+    border: 1px solid #d4c5b9;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: white;
+    font-family: "Patrick Hand", cursive;
+}
+
+.input-group input:focus {
+    border-color: #a0956b;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(160, 149, 107, 0.1);
+}
+
+.search-btn {
+    padding: 8px 16px;
+    background: #a0956b;
+    color: white;
+    border: 1px solid #8b7355;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: "Patrick Hand", cursive;
+    transition: background-color 0.2s ease;
+}
+
+.search-btn:hover {
+    background: #8b7355;
+}
+
+/* 股票資訊 */
+.stock-code {
+    background: #e8ddd4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #5d4e37;
+}
+
+.price-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.price-item {
+    border: 1px solid #e8ddd4;
+    padding: 12px;
+    border-radius: 4px;
+    text-align: center;
+    background: #fefefe;
+}
+
+.price-item .label {
+    display: block;
+    font-size: 0.85rem;
+    color: #8b7355;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.price-item .value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #5d4e37;
+}
+
+.price-item .value.change.positive {
+    color: #2d5016;
+}
+
+.price-item .value.change.negative {
+    color: #8b2635;
+}
+
+/* 綜合評分 */
+.score-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.score-circle {
+    width: 80px;
+    height: 80px;
+    border: 3px solid #d4c5b9;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    position: relative;
+}
+
+.score-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #5d4e37;
+}
+
+.score-max {
+    font-size: 0.8rem;
+    color: #8b7355;
+}
+
+.risk-level .label {
+    display: block;
+    font-size: 0.9rem;
+    color: #8b7355;
+    margin-bottom: 4px;
+}
+
+.risk-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid #d4c5b9;
+    border-radius: 4px;
+    font-weight: 500;
+    background: white;
+    color: #5d4e37;
+}
+
+.risk-badge.low { border-color: #a0956b; color: #2d5016; }
+.risk-badge.medium { border-color: #d4c5b9; color: #8b7355; }
+.risk-badge.high { border-color: #c9a96e; color: #8b2635; }
+
+/* 技術指標 */
+.indicators-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.indicator-item {
+    border: 1px solid #e8ddd4;
+    padding: 16px;
+    border-radius: 4px;
+    text-align: center;
+    background: #fefefe;
+}
+
+.indicator-name {
+    font-weight: 500;
+    color: #8b7355;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.indicator-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #5d4e37;
+    margin-bottom: 6px;
+}
+
+.indicator-status {
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px solid #e8ddd4;
+    background: white;
+}
+
+.indicator-status.bullish { border-color: #a0956b; color: #2d5016; }
+.indicator-status.bearish { border-color: #c9a96e; color: #8b2635; }
+.indicator-status.neutral { border-color: #d4c5b9; color: #8b7355; }
+
+/* 交易信號 */
+.signals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.signal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid;
+}
+
+.signal-item.buy {
+    background: #f0f9f0;
+    border-left-color: #28a745;
+}
+
+.signal-item.sell {
+    background: #fdf2f2;
+    border-left-color: #dc3545;
+}
+
+.signal-content {
+    flex: 1;
+}
+
+.signal-type {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.signal-reason {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.signal-strength {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.signal-strength.強 {
+    background: #dc3545;
+    color: white;
+}
+
+.signal-strength.中 {
+    background: #ffc107;
+    color: #333;
+}
+
+.signal-strength.弱 {
+    background: #6c757d;
+    color: white;
+}
+
+/* 無信號時的樣式 */
+.no-signals {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+}
+    border: 1px solid #e8ddd4;
+    border-radius: 4px;
+    background: #fefefe;
+}
+
+.signal-item.buy {
+    border-left: 4px solid #a0956b;
+}
+
+.signal-item.sell {
+    border-left: 4px solid #c9a96e;
+}
+
+.signal-content {
+    flex: 1;
+}
+
+.signal-type {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #5d4e37;
+}
+
+.signal-reason {
+    color: #8b7355;
+    font-size: 0.9rem;
+    margin-top: 2px;
+}
+
+.signal-strength {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid #e8ddd4;
+    background: white;
+    color: #5d4e37;
+}
+
+.signal-strength.strong { border-color: #a0956b; color: #2d5016; }
+.signal-strength.medium { border-color: #d4c5b9; color: #8b7355; }
+.signal-strength.weak { border-color: #e8ddd4; color: #8b7355; }
+
+/* 趨勢和動能分析 */
+.trend-content, .momentum-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.analysis-item {
+    padding: 8px 12px;
+    border: 1px solid #e8ddd4;
+    border-radius: 4px;
+    background: #fefefe;
+    color: #5d4e37;
+    font-size: 0.95rem;
+    border-left: 3px solid #d4c5b9;
+}
+
+/* 策略建議 */
+.suggestion-content {
+    background: #f8f6f3;
+    border: 1px solid #e8ddd4;
+    padding: 16px;
+    border-radius: 4px;
+    line-height: 1.6;
+    white-space: pre-line;
+    font-size: 0.95rem;
+    color: #5d4e37;
+    font-family: "Patrick Hand", cursive;
+}
+
+/* 詳細技術指標樣式 */
+.detailed-indicators-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.indicator-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8f6f3;
+    border-radius: 4px;
+    border-left: 3px solid #a0956b;
+    border: 1px solid #e8ddd4;
+}
+
+.indicator-label {
+    font-weight: 500;
+    color: #5d4e37;
+    font-size: 0.9rem;
+}
+
+.indicator-detail-value {
+    font-weight: bold;
+    color: #2d5016;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+/* 載入狀態 */
+.loading-state {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border: 1px solid #d4c5b9;
+    border-radius: 8px;
+    color: #8b7355;
+}
+
+.loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #e8ddd4;
+    border-top: 3px solid #a0956b;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .analysis-content {
+        padding: 6px;
+    }
+    
+    .input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .input-group label {
+        min-width: auto;
+    }
+    
+    .price-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .score-display {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .indicators-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-body {
+        padding: 8px 8px 8px 16px;
+    }
+    
+    .card-header {
+        padding: 6px 8px 6px 16px;
+    }
+}
