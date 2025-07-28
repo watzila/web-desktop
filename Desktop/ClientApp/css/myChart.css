@@ -1,0 +1,10 @@
+﻿/*備註框*/
+.remark {
+    background: rgba(247, 247, 247, 0.9);
+    box-shadow: 1px 1px rgba(0, 0, 0, 0.15), 3px 3px rgba(0, 0, 0, 0.09), 5px 5px rgba(0, 0, 0, 0.04);
+    border: #7cb5ec 1px solid;
+    border-radius: 3px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 99;
+}

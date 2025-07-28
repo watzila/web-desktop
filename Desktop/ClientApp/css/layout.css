@@ -13,14 +13,26 @@
   transform: translate(-50%, -50%);
 }
 
+.pad0 {
+    padding: 0 !important;
+}
+
+.willChange {
+    will-change: transform;
+}
+
+.posGlitchy {
+    transform: translateZ(0);
+}
+
 .module {
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 10px 10px 60px -8px rgba(0, 0, 0, 0.3);
-  grid-column: var(--x) / span var(--w);
-  grid-row: var(--y) / span var(--h);
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 10px 10px 60px -8px rgba(0, 0, 0, 0.3);
+    grid-column: var(--x) / span var(--w);
+    grid-row: var(--y) / span var(--h);
 }
 
 .module button {

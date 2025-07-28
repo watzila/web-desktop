@@ -1,4 +1,6 @@
-﻿<section class="appLayout">
+﻿<link href="/css/analysis.css" rel="stylesheet" />
+
+<section class="appLayout">
     <nav class="nav">
         <menu>
             <li class="menu-item">
@@ -7,13 +9,207 @@
         </menu>
     </nav>
 
+    <!-- 分析結果區域 - 使用假資料演示 -->
     <div class="mainArea">
         <section class="content">
-            <form>
-                代碼：<input type="text" name="stockId" style="padding: 3px; font-size: 0.8rem; border: 1px solid #ccc; border-radius: 6px; "/>
-                <input type="button" value="查詢" id="searchBTN" style="padding: 3px; font-size: 0.8rem; border: 1px solid #ccc; border-radius: 6px; "/>
-            </form>
-            <pre id="suggestion"></pre>
+            <!-- 搜尋區域 -->
+            <div class="search-section notebook-card posGlitchy">
+                <div class="card-header">
+                    <h3 class="card-title">📊 股票查詢</h3>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <label for="stockId">股票代碼：</label>
+                        <input type="text" name="stockId" id="stockId" placeholder="例如：2330" />
+                        <button type="button" id="searchBTN" class="search-btn">分析</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="analysisResults" class="analysis-results">
+                <!-- 股票基本資訊 -->
+                <div class="stock-info notebook-card posGlitchy">
+                    <div class="card-header">
+                        <h3 class="card-title">📈 股票資訊</h3>
+                        <div class="stock-code"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="price-info">
+                            <div class="price-item">
+                                <span class="label">收盤價</span>
+                                <span class="value">-</span>
+                            </div>
+                            <div class="price-item">
+                                <span class="label">漲跌</span>
+                                <span class="value change positive">-</span>
+                            </div>
+                            <div class="price-item">
+                                <span class="label">成交量</span>
+                                <span class="value">-</span>
+                            </div>
+                            <div class="price-item">
+                                <span class="label">日期</span>
+                                <span class="value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 綜合評分 -->
+                <div class="score-section notebook-card posGlitchy">
+                    <div class="card-header">
+                        <h3 class="card-title">⭐ 綜合評分</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="score-display">
+                            <div class="score-circle">
+                                <span class="score-value">0</span>
+                                <span class="score-max">/10</span>
+                            </div>
+                            <div class="risk-level">
+                                <span class="label">風險等級：</span>
+                                <span class="risk-badge medium">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 技術指標 -->
+                <div class="indicators-section notebook-card posGlitchy">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 技術指標</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="indicators-grid">
+                            <div class="indicator-item">
+                                <div class="indicator-name">RSI (14)</div>
+                                <div class="indicator-value"></div>
+                                <div class="indicator-status neutral">-</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-name">MA5</div>
+                                <div class="indicator-value"></div>
+                                <div class="indicator-status bullish">-</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-name">MA20</div>
+                                <div class="indicator-value"></div>
+                                <div class="indicator-status bullish">-</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-name">MACD</div>
+                                <div class="indicator-value"></div>
+                                <div class="indicator-status bullish">-</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-name">KD-K</div>
+                                <div class="indicator-value"></div>
+                                <div class="indicator-status neutral">-</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-name">KD-D</div>
+                                <div class="indicator-value"></div>
+                                <div class="indicator-status neutral">-</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-name">成交量比</div>
+                                <div class="indicator-value"></div>
+                                <div class="indicator-status neutral">-</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-name">量價關係</div>
+                                <div class="indicator-value"></div>
+                                <div class="indicator-status neutral">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 交易信號 -->
+                <div class="signals-section notebook-card posGlitchy">
+                    <div class="card-header">
+                        <h3 class="card-title">🎯 交易信號</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="signals-list">
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 趨勢分析 -->
+                <div class="trend-section notebook-card posGlitchy">
+                    <div class="card-header">
+                        <h3 class="card-title">📈 趨勢分析</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="trend-content"></div>
+                    </div>
+                </div>
+
+                <!-- 動能分析 -->
+                <div class="momentum-section notebook-card posGlitchy">
+                    <div class="card-header">
+                        <h3 class="card-title">⚡ 動能分析</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="momentum-content"></div>
+                    </div>
+                </div>
+
+                <!-- 詳細技術指標 -->
+                <div class="detailed-indicators notebook-card posGlitchy">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 詳細技術指標</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="detailed-indicators-grid">
+                            <div class="indicator-row">
+                                <span class="indicator-label">EMA12:</span>
+                                <span class="indicator-detail-value" id="ema12-value">--</span>
+                            </div>
+                            <div class="indicator-row">
+                                <span class="indicator-label">EMA26:</span>
+                                <span class="indicator-detail-value" id="ema26-value">--</span>
+                            </div>
+                            <div class="indicator-row">
+                                <span class="indicator-label">MACD訊號線:</span>
+                                <span class="indicator-detail-value" id="macd-signal-value">--</span>
+                            </div>
+                            <div class="indicator-row">
+                                <span class="indicator-label">MACD柱狀圖:</span>
+                                <span class="indicator-detail-value" id="macd-osc-value">--</span>
+                            </div>
+                            <div class="indicator-row">
+                                <span class="indicator-label">RSV:</span>
+                                <span class="indicator-detail-value" id="rsv-value">--</span>
+                            </div>
+                            <div class="indicator-row">
+                                <span class="indicator-label">5日均量:</span>
+                                <span class="indicator-detail-value" id="vma5-value">--</span>
+                            </div>
+                            <div class="indicator-row">
+                                <span class="indicator-label">20日均量:</span>
+                                <span class="indicator-detail-value" id="vma20-value">--</span>
+                            </div>
+                            <div class="indicator-row">
+                                <span class="indicator-label">MA10:</span>
+                                <span class="indicator-detail-value" id="ma10-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 策略建議 -->
+                <div class="suggestion-section notebook-card posGlitchy">
+                    <div class="card-header">
+                        <h3 class="card-title">💡 策略建議</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="suggestion" class="suggestion-content">不告訴你<(￣︶￣)> </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
 </section>
