@@ -27,24 +27,28 @@ async function stockAnalysis(stockId) {
         comprehensiveAnalysis: null
     };
 
-    // 擴展到6個月數據以獲得更準確的技術指標
-    for (let i = 0; i < 6; i++) {
+    // 並行抓取近 5 個月的月資料以獲得更準確的技術指標
+    const dateStrs = [];
+    for (let i = 0; i < 5; i++) {
         let year = today.getFullYear();
         let month = today.getMonth() + 1 - i;
         if (month <= 0) {
             year--;
             month += 12;
         }
-        const dateStr = `${year}${month.toString().padStart(2, '0')}01`;
-        const prices = await getClosePrices(stockId, dateStr);
-        result.stockDatas.push(...prices);
+        dateStrs.push(`${year}${month.toString().padStart(2, '0')}01`);
     }
 
-    result.stockDatas = result.stockDatas.filter(p => p.close > 0).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const monthDatas = await Promise.all(dateStrs.map(dateStr => getClosePrices(stockId, dateStr)));
+    monthDatas.forEach(prices => result.stockDatas.push(...prices));
 
-    //技術指標計算
+    // 過濾非法資料並按日期排序（使用 YYYY-MM-DD 以提升解析穩定性）
+    result.stockDatas = result.stockDatas
+        .filter(p => p && p.close > 0 && p.date)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // 技術指標計算
     const financialIndicators = new FinancialIndicators();
-    // 計算所有技術指標
     financialIndicators.calculateMA(result.stockDatas, [5, 10, 20, 60]);
     financialIndicators.calculateEMA(result.stockDatas, 12);
     financialIndicators.calculateEMA(result.stockDatas, 26);
@@ -58,7 +62,7 @@ async function stockAnalysis(stockId) {
     result.comprehensiveAnalysis = financialIndicators.comprehensiveAnalysis(result.stockDatas);
     
     // 生成建議
-    result.suggestion = analyzeResult(result.stockDatas, result.comprehensiveAnalysis);
+    result.suggestion = analyzeResult(result.stockDatas);
     
     return result;
 }
@@ -67,7 +71,12 @@ async function getClosePrices(stockNo, yyyymmdd) {
     const url = `https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=${yyyymmdd}&stockNo=${stockNo}`;
     const res = await fetch(url);
     const data = await res.json();
-    console.log(data);
+
+    // 基本防呆：檢查回傳狀態與資料結構
+    if (!data || data.stat !== 'OK' || !Array.isArray(data.data)) {
+        return [];
+    }
+
     const result = [];
     for (const row of data.data) {
         const date = convertDate(row[0]);
@@ -79,7 +88,7 @@ async function getClosePrices(stockNo, yyyymmdd) {
             high: parseFloat(row[4].replace(/,/g, '')) || 0,
             low: parseFloat(row[5].replace(/,/g, '')) || 0,
             close: parseFloat(row[6].replace(/,/g, '')) || 0,
-            volume: parseInt(row[8].replace(/,/g, '')) || 0,
+            volume: parseInt(row[1].replace(/,/g, '')) || 0,
             ma5: null,
             ma20: null,
             rsi: null,
@@ -110,9 +119,15 @@ async function getClosePrices(stockNo, yyyymmdd) {
 }
 
 function convertDate(rocDateStr) {
+    if (!rocDateStr || typeof rocDateStr !== 'string') return null;
     const parts = rocDateStr.split('/');
-    const year = parseInt(parts[0], 10) + 1911;
-    return `${year}/${parts[1]}/${parts[2]}`;
+    if (parts.length !== 3) return null;
+    const year = parseInt(parts[0], 10);
+    if (isNaN(year)) return null;
+    const yyyy = year + 1911;
+    const mm = parts[1];
+    const dd = parts[2];
+    return `${yyyy}-${mm}-${dd}`; // 使用 YYYY-MM-DD 以提升 new Date 解析穩定性
 }
 
 function analyzeResult(data) {
@@ -132,7 +147,7 @@ function analyzeResult(data) {
         const prev_ma5 = data[data.length - 2].ma5; // 獲取倒數第二筆數據的 ma5
         const prev_ma20 = data[data.length - 2].ma20; // 獲取倒數第二筆數據的 ma20
 
-        if (ma5 !== null && ma20 !== null && prev_ma5 !== null && prev_ma20 !== null) {
+        if (ma5 != null && ma20 != null && prev_ma5 != null && prev_ma20 != null) {
             result += `📊 均線指標`;
             result += `\n目前5日均線：${ma5.toFixed(2)}`;
             result += `\n目前20日均線：${ma20.toFixed(2)}`;
@@ -150,13 +165,13 @@ function analyzeResult(data) {
             result += "\n📉 資料不足，無法計算 20MA (MA值為空)。";
         }
     } else {
-        result += "\n📉 資料不足，無法計算 20MA (數據量不足)。";
+        result += "\n📉 資料不足，無法判斷 MA 交叉（至少需兩天資料）。";
     }
 
 
     // --- rsi 分析 ---
     const rsi = lastData.rsi;
-    if (rsi !== null) {
+    if (rsi != null) {
         result += `\n\n📈 RSI指標 (14日)`;
         result += `\n目前RSI值：${rsi.toFixed(2)}`;
 
@@ -174,7 +189,7 @@ function analyzeResult(data) {
 
     // --- macd 分析 ---
     // 檢查最新一筆數據是否有 macd 相關值
-    if (lastData.dif !== null && lastData.macd !== null) {
+    if (lastData.dif != null && lastData.macd != null) {
 
         const dif = lastData.dif;
         const macd = lastData.macd;
@@ -188,7 +203,7 @@ function analyzeResult(data) {
         // 判斷 macd 交叉訊號需要至少兩筆數據
         if (data.length >= 2) {
             const secondLastData = data[data.length - 2];
-            if (secondLastData.dif !== null && secondLastData.macd !== null) {
+            if (secondLastData.dif != null && secondLastData.macd != null) {
 
                 const prevDif = secondLastData.dif;
                 const prevMacdSignal = secondLastData.macd;
@@ -231,13 +246,13 @@ function analyzeResult(data) {
     }
 
     // --- 布林通道分析 ---
-    if (lastData.bbMiddle !== null && lastData.bbUpper !== null && lastData.bbLower !== null) {
+    if (lastData.bbMiddle != null && lastData.bbUpper != null && lastData.bbLower != null) {
         result += "\n\n📈 布林通道指標 (20日, 2倍標準差)";
         result += `\n上軌：${lastData.bbUpper.toFixed(2)}`;
         result += `\n中軌：${lastData.bbMiddle.toFixed(2)}`;
         result += `\n下軌：${lastData.bbLower.toFixed(2)}`;
         result += `\n目前價位：${lastData.close.toFixed(2)}`;
-        result += `\n通道位置：${(lastData.bbPosition * 100).toFixed(1)}%`;
+        result += `\n通道位置：${FinancialIndicators.multiply(lastData.bbPosition, 100).toFixed(1)}%`;
 
         if (lastData.bbPosition > 0.8) {
             result += "\n🔥 訊號：接近上軌，可能遇到阻力，留意回檔風險。";
@@ -252,7 +267,7 @@ function analyzeResult(data) {
         }
 
         // 通道寬度分析
-        const bbWidthRatio = lastData.bbWidth / lastData.bbMiddle;
+        const bbWidthRatio = FinancialIndicators.divide(lastData.bbWidth, lastData.bbMiddle);
         if (bbWidthRatio > 0.1) {
             result += "\n📏 通道寬度：較寬，市場波動較大。";
         } else if (bbWidthRatio < 0.05) {
@@ -266,7 +281,7 @@ function analyzeResult(data) {
     }
 
     // --- KD 指標分析 ---
-    if (lastData.k !== null && lastData.d !== null) {
+    if (lastData.k != null && lastData.d != null) {
         result += "\n\n📊 KD 指標 (9, 3, 3)";
         result += `\nK值：${lastData.k.toFixed(2)}`;
         result += `\nD值：${lastData.d.toFixed(2)}`;
@@ -305,7 +320,7 @@ function analyzeResult(data) {
     }
 
     // --- EMA 指標分析 ---
-    if (lastData.ema12 !== null && lastData.ema26 !== null) {
+    if (lastData.ema12 != null && lastData.ema26 != null) {
         result += "\n\n📈 EMA 指標";
         result += `\nEMA12：${lastData.ema12.toFixed(2)}`;
         result += `\nEMA26：${lastData.ema26.toFixed(2)}`;
@@ -332,7 +347,7 @@ function analyzeResult(data) {
     }
 
     // --- 多週期均線分析 ---
-    if (lastData.ma10 !== null && lastData.ma60 !== null) {
+    if (lastData.ma10 != null && lastData.ma60 != null) {
         result += "\n\n📊 多週期均線分析";
         result += `\nMA5：${lastData.ma5 ? lastData.ma5.toFixed(2) : 'N/A'}`;
         result += `\nMA10：${lastData.ma10.toFixed(2)}`;
@@ -345,7 +360,7 @@ function analyzeResult(data) {
             { name: 'MA10', value: lastData.ma10 },
             { name: 'MA20', value: lastData.ma20 },
             { name: 'MA60', value: lastData.ma60 }
-        ].filter(ma => ma.value !== null).sort((a, b) => b.value - a.value);
+        ].filter(ma => ma.value != null && Number.isFinite(ma.value)).sort((a, b) => b.value - a.value);
 
         if (mas.length >= 3) {
             const isMultiArrangement = mas[0].name === 'MA5' && mas[1].name === 'MA10' && mas[2].name === 'MA20';
@@ -359,14 +374,34 @@ function analyzeResult(data) {
                 result += "\n🔄 排列：均線糾結，趨勢不明確。";
             }
         }
+
+        // 中期均線交叉 (20 vs 60)
+        if (data.length >= 2) {
+            const prev = data[data.length - 2];
+            const m20 = lastData.ma20;
+            const m60 = lastData.ma60;
+            const prev20 = prev.ma20;
+            const prev60 = prev.ma60;
+            if (m20 != null && m60 != null && prev20 != null && prev60 != null) {
+                if (prev20 <= prev60 && m20 > m60) {
+                    result += "\n✨ 訊號：20MA 向上突破 60MA（中期黃金交叉）。";
+                } else if (prev20 >= prev60 && m20 < m60) {
+                    result += "\n💀 訊號：20MA 向下跌破 60MA（中期死亡交叉）。";
+                } else if (m20 > m60) {
+                    result += "\n🟢 趨勢：20MA 在 60MA 之上，中期偏多。";
+                } else if (m20 < m60) {
+                    result += "\n🔴 趨勢：20MA 在 60MA 之下，中期偏空。";
+                }
+            }
+        }
     }
 
     // --- 成交量分析 ---
-    if (lastData.vma5 !== null && lastData.vma20 !== null) {
+    if (lastData.vma5 != null && lastData.vma20 != null) {
         result += "\n\n📊 成交量分析";
-        result += `\n今日成交量：${(lastData.volume / 1000).toFixed(0)}K股`;
-        result += `\n5日平均量：${(lastData.vma5 / 1000).toFixed(0)}K股`;
-        result += `\n20日平均量：${(lastData.vma20 / 1000).toFixed(0)}K股`;
+        result += `\n今日成交量：${FinancialIndicators.divide(lastData.volume, 1000).toFixed(0)}K股`;
+        result += `\n5日平均量：${FinancialIndicators.divide(lastData.vma5, 1000).toFixed(0)}K股`;
+        result += `\n20日平均量：${FinancialIndicators.divide(lastData.vma20, 1000).toFixed(0)}K股`;
 
         const volumeRatio5 = FinancialIndicators.divide(lastData.volume, lastData.vma5);
         const volumeRatio20 = FinancialIndicators.divide(lastData.volume, lastData.vma20);
@@ -451,23 +486,28 @@ class FinancialIndicators {
     */
     static multiply(a, b) {
         if (a === 0 || b === 0) return 0;
-        
-        // 改進：使用更穩定的精度處理
-        const result = a * b;
-        
-        // 如果結果很接近整數，則返回整數
+
+        // 整數化算法：將 a、b 各自去小數點後轉為整數再計算，降低浮點誤差
+        const decA = FinancialIndicators.getDecimalPlaces(a);
+        const decB = FinancialIndicators.getDecimalPlaces(b);
+
+        // 將數字按其小數位數轉為整數字串，再轉回數字，避免直接乘 10^n 的浮點誤差
+        const intA = parseInt(a.toFixed(decA).replace('.', ''), 10);
+        const intB = parseInt(b.toFixed(decB).replace('.', ''), 10);
+
+        // 計算乘積後再縮放回來
+        const scaledProduct = intA * intB;
+        const result = scaledProduct / Math.pow(10, decA + decB);
+
+        // 如果結果非常接近整數，直接回傳整數（維持原本行為）
         if (Math.abs(result - Math.round(result)) < Number.EPSILON) {
             return Math.round(result);
         }
-        
-        // 限制最大精度避免過度計算
-        const decimalPlacesA = FinancialIndicators.getDecimalPlaces(a);
-        const decimalPlacesB = FinancialIndicators.getDecimalPlaces(b);
-        const maxDecimalPlaces = Math.max(decimalPlacesA, decimalPlacesB);
-        const precision = Math.min(maxDecimalPlaces + 2, 10); // 限制最大精度為10位
-        
-        const factor = Math.pow(10, precision);
-        return Math.round(result * factor) / factor;
+
+        // 與原行為一致：動態決定四捨五入精度，使用 max(decA, decB) + 2，並限制上限
+        const maxDecimalPlaces = Math.max(decA, decB);
+        const precision = Math.min(maxDecimalPlaces + 2, 10);
+        return FinancialIndicators.round(result, precision);
     }
     /**
      * 精確除法
@@ -477,21 +517,27 @@ class FinancialIndicators {
      */
     static divide(a, b) {
         if (b === 0) return 0;
-        
-        // 改進：使用更穩定的除法計算
-        const result = a / b;
-        
-        // 如果結果很接近整數，則返回整數
+
+        // 整數化 + 尺度算法：將 a、b 去小數後相除，並用 10^(decB - decA) 調整尺度
+        const decA = FinancialIndicators.getDecimalPlaces(a);
+        const decB = FinancialIndicators.getDecimalPlaces(b);
+
+        const intA = parseInt(a.toFixed(decA).replace('.', ''), 10);
+        const intB = parseInt(b.toFixed(decB).replace('.', ''), 10);
+        if (intB === 0) return 0; // 再次防呆
+
+        // (intA / intB) * 10^(decB - decA)
+        const raw = intA / intB;
+        const result = raw * Math.pow(10, decB - decA);
+
+        // 如果結果非常接近整數，直接回傳整數（維持原本行為）
         if (Math.abs(result - Math.round(result)) < Number.EPSILON) {
             return Math.round(result);
         }
-        
-        // 動態決定精度，避免過度四捨五入
-        const decimalPlacesA = FinancialIndicators.getDecimalPlaces(a);
-        const decimalPlacesB = FinancialIndicators.getDecimalPlaces(b);
-        const maxDecimalPlaces = Math.max(decimalPlacesA, decimalPlacesB);
-        const precision = Math.min(maxDecimalPlaces + 4, 12); // 除法需要更高精度，限制最大為12位
-        
+
+        // 與原行為一致：動態決定四捨五入精度，使用 max(decA, decB) + 4，並限制上限
+        const maxDecimalPlaces = Math.max(decA, decB);
+        const precision = Math.min(maxDecimalPlaces + 4, 12);
         return FinancialIndicators.round(result, precision);
     }
     /**
@@ -802,10 +848,10 @@ class FinancialIndicators {
 
         return {
             trend: this.analyzeTrend(latest, previous),
-            momentum: this.analyzeMomentum(latest),
+            momentum: this.analyzeMomentum(latest, previous, data.slice(-5)),
             volatility: this.analyzeVolatility(data.slice(-20)), // 最近20天
             volume: this.analyzeVolume(latest, previous),
-            signals: this.generateSignals(latest, previous),
+            signals: this.generateSignals(latest, previous, data.slice(-5)), 
             riskLevel: this.assessRisk(latest, data.slice(-20)),
             score: this.calculateOverallScore(latest, previous)
         };
@@ -825,12 +871,22 @@ class FinancialIndicators {
             }
         }
 
-        if (latest.bbPosition !== undefined) {
+        if (latest.bbPosition != null) {
             if (latest.bbPosition > 0.8) {
                 trends.push("接近上軌，注意阻力");
             } else if (latest.bbPosition < 0.2) {
                 trends.push("接近下軌，注意支撐");
             }
+        }
+
+        // MA60/季線 與中期趨勢
+        if (latest.ma20 != null && latest.ma60 != null) {
+            if (latest.ma20 > latest.ma60) trends.push("中期趨勢向上");
+            else trends.push("中期趨勢向下");
+        }
+        if (latest.ma60 != null && latest.close != null) {
+            if (latest.close > latest.ma60) trends.push("價格站上季線");
+            else trends.push("價格跌破季線");
         }
 
         return trends;
@@ -839,19 +895,107 @@ class FinancialIndicators {
     /**
      * 動能分析
      */
-    analyzeMomentum(latest) {
+    analyzeMomentum(latest, previous = null, recent = []) {
         const momentum = [];
 
-        if (latest.rsi !== undefined) {
-            if (latest.rsi > 70) momentum.push("RSI超買");
-            else if (latest.rsi < 30) momentum.push("RSI超賣");
-            else momentum.push("RSI中性");
+        // 1) RSI：用白話解釋力度與含義
+        if (latest.rsi != null) {
+            const rsi = latest.rsi;
+            const prevRsi = previous && previous.rsi != null ? previous.rsi : null;
+            const delta = prevRsi != null ? rsi - prevRsi : null;
+
+            const zone = rsi >= 70 ? "超買（偏熱）" : rsi <= 30 ? "超賣（偏冷）" : rsi >= 50 ? "偏多" : "偏空";
+            const trend = delta != null ? (delta > 0.5 ? `較昨日上升 ${delta.toFixed(2)}` : (delta < -0.5 ? `較昨日下降 ${Math.abs(delta).toFixed(2)}` : "與昨日變化不大")) : null;
+            const cross50 = prevRsi != null ? (prevRsi <= 50 && rsi > 50 ? "今天站上 50" : (prevRsi >= 50 && rsi < 50 ? "今天跌破 50" : null)) : null;
+
+            const meaning = rsi > 70
+                ? "買方力量明顯較強，短線續漲機會較高，但也更容易出現震盪或回檔。"
+                : rsi < 30
+                ? "賣方力量偏強，但下跌動能可能接近尾聲，短線較容易出現技術性反彈。"
+                : rsi >= 50
+                ? "買方力量略占優勢，偏多但強度普通。"
+                : "賣方力量略占優勢，偏空但強度普通。";
+
+            const pieces = [
+                `RSI 現為 ${rsi.toFixed(2)}（${zone}）`,
+                trend,
+                cross50,
+                meaning
+            ].filter(Boolean);
+            momentum.push(pieces.join("；"));
         }
 
-        if (latest.k !== undefined && latest.d !== undefined) {
-            if (latest.k > 80) momentum.push("KD超買");
-            else if (latest.k < 20) momentum.push("KD超賣");
-            else momentum.push("KD中性");
+        // 2) MACD/OSC：用白話解釋動能方向與變化
+        if (latest.osc != null && latest.dif != null && latest.macd != null) {
+            const osc = latest.osc;
+            const prevOsc = previous && previous.osc != null ? previous.osc : null;
+            const delta = prevOsc != null ? (osc - prevOsc) : null;
+            const dir = osc > 0 ? "正值（多方動能）" : osc < 0 ? "負值（空方動能）" : "接近零軸（動能中性）";
+            const change = delta != null ? (delta > 0 ? `較昨日擴大 ${delta.toFixed(2)}` : (delta < 0 ? `較昨日縮小 ${Math.abs(delta).toFixed(2)}` : "與昨日變化不大")) : null;
+            const arrange = latest.dif > latest.macd ? "多頭排列（DIF 在訊號線上方）" : latest.dif < latest.macd ? "空頭排列（DIF 在訊號線下方）" : "DIF 與訊號線接近";
+
+            const meaning = osc > 0
+                ? (delta != null && delta > 0 ? "上漲動能正在增加，趨勢偏多。" : "上漲動能存在但未明顯增加。")
+                : osc < 0
+                ? (delta != null && delta < 0 ? "下跌動能正在增加，趨勢偏空。" : "下跌動能存在但未明顯增加。")
+                : "動能不足，價格可能偏向盤整。";
+
+            const pieces = [
+                `MACD 柱狀圖為 ${dir}（OSC ${osc.toFixed(2)}）`,
+                change,
+                arrange,
+                meaning
+            ].filter(Boolean);
+            momentum.push(pieces.join("；"));
+        }
+
+        // 3) KD：用白話解釋區域、交叉與方向
+        if (latest.k != null && latest.d != null) {
+            const k = latest.k, d = latest.d;
+            const prevK = previous && previous.k != null ? previous.k : null;
+            const prevD = previous && previous.d != null ? previous.d : null;
+            const deltaK = prevK != null ? (k - prevK) : null;
+
+            const zone = (k > 80 && d > 80) ? "超買（偏熱）" : (k < 20 && d < 20) ? "超賣（偏冷）" : "中性區";
+            const cross = (prevK != null && prevD != null)
+                ? (prevK <= prevD && k > d ? "出現黃金交叉（短線轉強訊號）" : (prevK >= prevD && k < d ? "出現死亡交叉（短線轉弱訊號）" : null))
+                : null;
+            const kTrend = deltaK != null ? (deltaK > 1 ? `K 值較昨日上升 ${deltaK.toFixed(2)}` : (deltaK < -1 ? `K 值較昨日下降 ${Math.abs(deltaK).toFixed(2)}` : "K 值與昨日變化不大")) : null;
+
+            const meaning = (k > d)
+                ? "K 線在 D 線之上，通常代表短線動能偏多。"
+                : (k < d)
+                ? "K 線在 D 線之下，通常代表短線動能偏空。"
+                : "K 與 D 接近，短線方向不明。";
+
+            const pieces = [
+                `KD 現為 K ${k.toFixed(2)}、D ${d.toFixed(2)}（${zone}）`,
+                cross,
+                kTrend,
+                meaning
+            ].filter(Boolean);
+            momentum.push(pieces.join("；"));
+        }
+
+        // 4) 短期 ROC（3日）：用百分比說明
+        if (recent && recent.length >= 4) {
+            const base = recent[recent.length - 4].close;
+            if (base > 0 && latest.close != null) {
+                const roc3 = FinancialIndicators.multiply(
+                    FinancialIndicators.divide(
+                        FinancialIndicators.subtract(latest.close, base),
+                        base
+                    ),
+                    100
+                );
+                const tag = roc3 > 2 ? "偏強" : roc3 < -2 ? "偏弱" : "中性";
+                const meaning = roc3 > 2
+                    ? "短線漲幅較明顯，買方動能佔優。"
+                    : roc3 < -2
+                    ? "短線跌幅較明顯，賣方動能佔優。"
+                    : "短線變動有限，價格多在區間震盪。";
+                momentum.push(`近 3 日變動為 ${roc3.toFixed(2)}%（${tag}）；${meaning}`);
+            }
         }
 
         return momentum;
@@ -905,29 +1049,53 @@ class FinancialIndicators {
     /**
      * 生成交易信號
      */
-    generateSignals(latest, previous) {
+    generateSignals(latest, previous, recent = []) {
         const signals = [];
 
-        // MA 交叉信號
+        // MA 交叉信號（去雜訊：要求交叉後仍維持，且跨越幅度至少 0.1%）
         if (previous && latest.ma5 && latest.ma20 && previous.ma5 && previous.ma20) {
-            if (previous.ma5 <= previous.ma20 && latest.ma5 > latest.ma20) {
-                signals.push({ type: "買進", reason: "MA黃金交叉", strength: "強" });
-            } else if (previous.ma5 >= previous.ma20 && latest.ma5 < latest.ma20) {
-                signals.push({ type: "賣出", reason: "MA死亡交叉", strength: "強" });
+            const crossedUp = previous.ma5 <= previous.ma20 && latest.ma5 > latest.ma20;
+            const crossedDown = previous.ma5 >= previous.ma20 && latest.ma5 < latest.ma20;
+            const crossStrength = FinancialIndicators.divide(
+                Math.abs(FinancialIndicators.subtract(latest.ma5, latest.ma20)),
+                latest.ma20
+            );
+
+            const sustainedUp = crossedUp && recent.length >= 2
+                ? recent.slice(-2).every(x => x.ma5 && x.ma20 ? x.ma5 >= x.ma20 : true)
+                : crossedUp;
+            const sustainedDown = crossedDown && recent.length >= 2
+                ? recent.slice(-2).every(x => x.ma5 && x.ma20 ? x.ma5 <= x.ma20 : true)
+                : crossedDown;
+
+            if (sustainedUp && crossStrength >= 0.001) {
+                signals.push({ type: "買進", reason: "MA黃金交叉（維持）", strength: crossStrength > 0.005 ? "強" : "中" });
+            } else if (sustainedDown && crossStrength >= 0.001) {
+                signals.push({ type: "賣出", reason: "MA死亡交叉（維持）", strength: crossStrength > 0.005 ? "強" : "中" });
             }
         }
 
-        // MACD 信號
-        if (previous && latest.dif && latest.macd && previous.dif && previous.macd) {
-            if (previous.dif <= previous.macd && latest.dif > latest.macd) {
-                signals.push({ type: "買進", reason: "MACD黃金交叉", strength: "中" });
-            } else if (previous.dif >= previous.macd && latest.dif < latest.macd) {
-                signals.push({ type: "賣出", reason: "MACD死亡交叉", strength: "中" });
+        // MACD 信號（去雜訊：交叉後連續維持，且 OSC 同向配合）
+        if (previous && latest.dif != null && latest.macd != null && previous.dif != null && previous.macd != null) {
+            const crossedUp = previous.dif <= previous.macd && latest.dif > latest.macd;
+            const crossedDown = previous.dif >= previous.macd && latest.dif < latest.macd;
+
+            const sustainedUp = crossedUp && recent.length >= 2
+                ? recent.slice(-2).every(x => (x.dif != null && x.macd != null) ? x.dif >= x.macd : true)
+                : crossedUp;
+            const sustainedDown = crossedDown && recent.length >= 2
+                ? recent.slice(-2).every(x => (x.dif != null && x.macd != null) ? x.dif <= x.macd : true)
+                : crossedDown;
+
+            if (sustainedUp && latest.osc > 0) {
+                signals.push({ type: "買進", reason: "MACD黃金交叉（維持且動能正）", strength: "中" });
+            } else if (sustainedDown && latest.osc < 0) {
+                signals.push({ type: "賣出", reason: "MACD死亡交叉（維持且動能負）", strength: "中" });
             }
         }
 
         // RSI 極值信號
-        if (latest.rsi) {
+        if (latest.rsi != null) {
             if (latest.rsi < 30) {
                 signals.push({ type: "買進", reason: "RSI超賣反彈", strength: "中" });
             } else if (latest.rsi > 70) {
@@ -970,26 +1138,26 @@ class FinancialIndicators {
         let score = 5; // 基準分數
 
         // MA 趨勢加分
-        if (latest.ma5 && latest.ma20) {
+        if (latest.ma5 != null && latest.ma20 != null) {
             if (latest.ma5 > latest.ma20) score += 1;
             else score -= 1;
         }
 
         // RSI 加分
-        if (latest.rsi) {
+        if (latest.rsi != null) {
             if (latest.rsi > 30 && latest.rsi < 70) score += 1;
             else if (latest.rsi < 30) score += 2; // 超賣反彈機會
             else if (latest.rsi > 70) score -= 1; // 超買風險
         }
 
         // MACD 加分
-        if (latest.dif && latest.macd) {
+        if (latest.dif != null && latest.macd != null) {
             if (latest.dif > latest.macd) score += 1;
             else score -= 1;
         }
 
         // 成交量加分
-        if (latest.volume && latest.vma5) {
+        if (latest.volume != null && latest.vma5 != null) {
             const volumeRatio = FinancialIndicators.divide(latest.volume, latest.vma5);
             if (volumeRatio > 1.2) score += 0.5; // 放量
         }
