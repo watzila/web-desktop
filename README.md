@@ -20,6 +20,8 @@
 
 建議使用桌機版瀏覽器體驗。手機版未特別優化可能會出現錯誤。
 
+(目前以indexeddb瀏覽器存取離線模式為主開發)
+
 ---
 
 ## ✨ 功能介紹
@@ -44,6 +46,10 @@
 
 * 支援打開、儲存純文字
 
+### 📈 股票策略分析（開發中）
+
+* 支援MA、EMA、RSI、MACD、布林通道、KD隨機指標、成交量分析(僅供參考)
+* 每日股價資料來源台灣證券交易所
 ---
 
 ## 📚 使用與開發方式
@@ -58,7 +64,7 @@
 ```
 static enableOffline = true;
 ```
-預設資料`Desktop/ClientApp/db.json`
+資料庫結構和預設資料`Desktop/ClientApp/db.json`
 
 ---
 
@@ -70,7 +76,7 @@ static enableOffline = true;
 | Iframe API        | 使用 YouTube 提供的嵌入式播放控制      |
 | Template 模板系統  | 簡易模板系統，透過js讀取html替換文字插入資料 |
 | .NET Web API      | 提供後端接資料庫存取    |
-| IndexedDB         | 提供瀏覽器資料存取    |
+| IndexedDB         | 提供瀏覽器資料庫存取    |
 
 ---
 
@@ -82,4 +88,4 @@ static enableOffline = true;
 
 ## 🙋‍♂️ 作者
 
-由 [@watzila](https://github.com/watzila)、Chatgpt 共同開發與維護。如有任何建議、想法或想互相討論，歡迎開 Issue 或交流。
+由 [@watzila](https://github.com/watzila)、AI 共同開發與維護。如有任何建議、想法或想互相討論，歡迎開 Issue 或交流。
