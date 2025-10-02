@@ -1,6 +1,7 @@
 ﻿import BaseComponent from "./BaseComponent.js";
 import Ajax from "./component/ajax.js";
 import eventBus from "./component/eventBus.js";
+import "./component/myChart.js";
 class Twse extends BaseComponent {
     constructor(id, model) {
         super(id);
@@ -22,7 +23,7 @@ class Twse extends BaseComponent {
                 data: { id: stockId },
                 fn: (result) => {
                     if (result.returnCode === 200) {
-                        //console.log(JSON.stringify(result))
+                        console.log(JSON.stringify(result))
                         this.updateStockData(result.returnData, stockId);
                     } else {
                         eventBus.emit("error", result.returnMsg);
@@ -32,6 +33,8 @@ class Twse extends BaseComponent {
                 eventBus.emit("error", error.message);
             });
         });
+
+        // 示範圖表功能已移除
     }
 
     updateStockData(data, stockId) {
@@ -47,6 +50,12 @@ class Twse extends BaseComponent {
         
         // 更新技術指標
         this.updateIndicators(latestData);
+        
+        // 繪製所有圖表
+        this.drawPriceChart(data.stockDatas);
+        this.drawMacdChart(data.stockDatas);
+        this.drawVolumeChart(data.stockDatas);
+        this.drawRSIChart(data.stockDatas);
         
         // 更新詳細技術指標
         this.updateDetailedIndicators(latestData);
@@ -282,6 +291,313 @@ class Twse extends BaseComponent {
         
         statusElement.className = `indicator-status ${status}`;
         statusElement.textContent = text;
+    }
+
+    drawPriceChart(stockDatas) {
+        // 只顯示最近的數據視窗（Phase1：先用 30 天，日後可改 60 天 或 捲動）
+        const recentDays = 30;
+        const recentData = stockDatas.slice(-recentDays);
+        
+        // 準備圖表數據
+        const dates = recentData.map(item => {
+            const date = new Date(item.date);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        });
+        
+        const closePrices = recentData.map(item => item.close);
+        
+        // 處理移動平均線數據 - 使用實際數據結構
+        const ma5Values = recentData.map(item => item.ma5 || null);
+        const ma10Values = recentData.map(item => item.ma10 || null);
+        const ma20Values = recentData.map(item => item.ma20 || null);
+        const ma60Values = recentData.map(item => item.ma60 || null);
+
+        // 布林通道
+        const bbUpper = recentData.map(item => item.bbUpper || null);
+        const bbMiddle = recentData.map(item => item.bbMiddle || null);
+        const bbLower = recentData.map(item => item.bbLower || null);
+        
+        // 清除之前的圖表
+        const container = this.iframe.querySelector('#priceChartContainer');
+        if (!container) {
+            console.error("找不到圖表容器 #priceChartContainer");
+            return;
+        }
+        container.innerHTML = '';
+        
+        try {
+            console.log("準備創建價格走勢圖表，顯示最近", recentData.length, "天數據");            
+            // 準備圖表數據陣列 - MA 與 布林通道
+            const chartData = [
+                { 
+                    subject: "收盤價", 
+                    value: closePrices, 
+                    color: "#2196F3" 
+                }
+            ];
+            
+            // 檢查並添加 MA5
+            const validMA5 = ma5Values.filter(v => v !== null);
+            if (validMA5.length > 0) {
+                chartData.push({
+                    subject: "MA5", 
+                    value: ma5Values.map(v => v || 0), 
+                    color: "#FF9800" 
+                });
+            }
+            
+            // 檢查並添加 MA10
+            const validMA10 = ma10Values.filter(v => v !== null);
+            if (validMA10.length > 0) {
+                chartData.push({
+                    subject: "MA10", 
+                    value: ma10Values.map(v => v || 0), 
+                    color: "#9C27B0" 
+                });
+            }
+            
+            // 檢查並添加 MA20
+            const validMA20 = ma20Values.filter(v => v !== null);
+            if (validMA20.length > 0) {
+                chartData.push({
+                    subject: "MA20", 
+                    value: ma20Values.map(v => v || 0), 
+                    color: "#4CAF50" 
+                });
+            }
+
+            // 檢查並添加 MA60
+            const validMA60 = ma60Values.filter(v => v !== null);
+            if (validMA60.length > 0) {
+                chartData.push({
+                    subject: "MA60", 
+                    value: ma60Values.map(v => v || 0), 
+                    color: "#9E9E9E" 
+                });
+            }
+
+            // 檢查並添加 布林通道（上/中/下）
+            const validBBUpper = bbUpper.filter(v => v !== null);
+            const validBBMiddle = bbMiddle.filter(v => v !== null);
+            const validBBLower = bbLower.filter(v => v !== null);
+            if (validBBUpper.length > 0 && validBBLower.length > 0) {
+                chartData.push({ subject: "BB Upper", value: bbUpper.map(v => v || 0), color: "#90CAF9" });
+                chartData.push({ subject: "BB Middle", value: bbMiddle.map(v => v || 0), color: "#B0BEC5" });
+                chartData.push({ subject: "BB Lower", value: bbLower.map(v => v || 0), color: "#90CAF9" });
+            }
+            
+            // 使用 NewChart 創建價格走勢圖
+            const priceChart = new NewChart({
+                canvas: "priceChartContainer",
+                type: "line",
+                title: { text: "股價走勢（收盤價/均線/布林通道）", size: "16px" },
+                equal: 6,
+                axis: {
+                    x: { 
+                        categories: dates,
+                        color: "#666",
+                        unit: { text: "日期" },
+                        isSubline: true,
+                        subColor: "#f0f0f0"
+                    },
+                    y: { 
+                        unit: { text: "價格(元)" },
+                        pos: "left"
+                    }
+                },
+                data: chartData
+            });
+            
+        } catch (error) {
+            console.error("創建圖表時發生錯誤:", error);
+            container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">圖表載入失敗，請稍後再試</p>';
+        }
+    }
+
+    // 新增：繪製 RSI 指標圖表
+    drawRSIChart(stockDatas) {
+        const container = this.iframe.querySelector('#rsiChartContainer');
+        if (!container) return;
+        
+        // 解讀提示
+        container.insertAdjacentHTML('beforebegin', '<div class="chart-hint">提示：RSI > 70 可能偏熱、< 30 可能偏冷，50 為趨勢分水嶺。</div>');
+        
+        // 只顯示最近的數據視窗（Phase1：先用 30 天）
+        const recentDays = 30;
+        const recentData = stockDatas.slice(-recentDays);
+        
+        const dates = recentData.map(item => {
+            const date = new Date(item.date);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        });
+        
+        const rsiValues = recentData.map(item => item.rsi || null);
+        const validRSI = rsiValues.filter(v => v !== null);
+        
+        if (validRSI.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">RSI 數據不足</p>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        
+        try {
+            const rsiChart = new NewChart({
+                canvas: "rsiChartContainer",
+                type: "line",
+                title: { text: "RSI 相對強弱指標", size: "14px" },
+                equal: 4,
+                axis: {
+                    x: { 
+                        categories: dates,
+                        color: "#666",
+                        unit: { text: "日期" }
+                    },
+                    y: { 
+                        unit: { text: "RSI" },
+                        pos: "left"
+                    }
+                },
+                data: [
+                    { 
+                        subject: "RSI", 
+                        value: rsiValues.map(v => v || 0), 
+                        color: "#E91E63" 
+                    }
+                ]
+            });
+            
+        } catch (error) {
+            console.error("創建 RSI 圖表失敗:", error);
+        }
+    }
+
+    // 新增：繪製 MACD 圖表（DIF/Signal + 柱狀圖 OSC）
+    drawMacdChart(stockDatas) {
+        const container = this.iframe.querySelector('#priceChartContainer');
+        if (!container) return;
+        
+        // 只顯示最近的數據視窗（Phase1：先用 30 天）
+        const recentDays = 30;
+        const recentData = stockDatas.slice(-recentDays);
+        const dates = recentData.map(item => {
+            const date = new Date(item.date);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        });
+        
+        const dif = recentData.map(item => (item.dif != null ? item.dif : 0));
+        const macdSignal = recentData.map(item => (item.macd != null ? item.macd : 0));
+        const osc = recentData.map(item => (item.osc != null ? item.osc : 0));
+        
+        // 在價格圖下方疊加 MACD（暫用 mergeChart 疊加；日後可獨立容器）
+        try {
+            const macdChart = new NewChart({
+                canvas: "volumeChartContainer",
+                type: "line",
+                title: { text: "MACD（DIF/Signal + 柱狀圖）", size: "14px" },
+                equal: 5,
+                axis: {
+                    x: { categories: dates, color: "#666", unit: { text: "日期" } },
+                    y: { unit: { text: "值" }, pos: "left" }
+                },
+                data: [
+                    { subject: "DIF", value: dif, color: "#2196F3" },
+                    { subject: "Signal", value: macdSignal, color: "#F44336" }
+                ]
+            });
+            macdChart.mergeChart({
+                type: "bar",
+                axis: { x: { categories: dates, unit: { text: "日期" } }, y: { unit: { text: "柱" }, pos: "left" } },
+                data: [
+                    { subject: "OSC", value: osc, color: "#4CAF50" }
+                ]
+            });
+        } catch (error) {
+            console.error("創建 MACD 圖表失敗:", error);
+        }
+    }
+
+    // 新增：繪製成交量圖表
+    drawVolumeChart(stockDatas) {
+        const container = this.iframe.querySelector('#volumeChartContainer');
+        if (!container) return;
+        
+        // 解讀提示
+        container.insertAdjacentHTML('beforebegin', '<div class="chart-hint">提示：突破或跌破時若有放量，訊號較可靠；無量突破需謹慎。</div>');
+        
+        // 只顯示最近的數據視窗（Phase1：先用 30 天）
+        const recentDays = 30;
+        const recentData = stockDatas.slice(-recentDays);
+        
+        const dates = recentData.map(item => {
+            const date = new Date(item.date);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        });
+        
+        const volumes = recentData.map(item => item.volume || 0);
+        const vma5Values = recentData.map(item => item.vma5 || null);
+        
+        container.innerHTML = '';
+        
+        try {
+            const chartData = [
+                { 
+                    subject: "成交量", 
+                    value: volumes, 
+                    color: "#607D8B" 
+                }
+            ];
+            
+            // 添加 5日均量
+            const validVMA5 = vma5Values.filter(v => v !== null);
+            if (validVMA5.length > 0) {
+                chartData.push({
+                    subject: "5日均量", 
+                    value: vma5Values.map(v => v || 0), 
+                    color: "#FF5722" 
+                });
+            }
+            
+            const volumeChart = new NewChart({
+                canvas: "volumeChartContainer",
+                type: "bar",
+                title: { text: "成交量分析", size: "14px" },
+                equal: 5,
+                axis: {
+                    x: { 
+                        categories: dates,
+                        color: "#666",
+                        unit: { text: "日期" }
+                    },
+                    y: { 
+                        unit: { text: "股" },
+                        pos: "left"
+                    }
+                },
+                data: chartData
+            });
+            
+        } catch (error) {
+            console.error("創建成交量圖表失敗:", error);
+        }
+    }
+
+    // 使用 stockdata.json 作為示範數據來測試圖表功能
+    loadDemoData() {
+        // 載入示範數據來展示圖表功能
+        fetch('/stockdata.json')
+            .then(response => response.json())
+            .then(data => {
+                if (data.returnCode === 200 && data.returnData && data.returnData.stockDatas) {
+                    // 模擬股票查詢的完整流程
+                    this.updateStockData(data.returnData, "DEMO");
+                } else {
+                    console.error("示範數據格式錯誤");
+                }
+            })
+            .catch(error => {
+                console.error("載入示範數據失敗:", error);
+            });
     }
 
     updateDetailedIndicators(stockData) {
