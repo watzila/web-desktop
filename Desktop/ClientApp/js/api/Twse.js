@@ -9,11 +9,12 @@
     },
     "/api/Twse/Stock": async (ctx, data) => {
         const result = await stockAnalysis(data.id);
+        const processedData = formatDataForFrontend(result, data.id);
 
         return {
             returnCode: 200,
             returnMsg: "success",
-            returnData: result,
+            returnData: processedData,
             js: null
         };
     }
@@ -1164,4 +1165,266 @@ class FinancialIndicators {
 
         return Math.max(1, Math.min(10, Math.round(score * 10) / 10));
     }
+}
+
+/**
+ * 將原始分析數據格式化為前端可直接使用的格式
+ * @param {Object} rawData 原始分析數據
+ * @param {string} stockId 股票代號
+ * @returns {Object} 格式化後的數據
+ */
+function formatDataForFrontend(rawData, stockId) {
+    if (!rawData.stockDatas || rawData.stockDatas.length === 0) {
+        return null;
+    }
+
+    const latestData = rawData.stockDatas[rawData.stockDatas.length - 1];
+    const previousData = rawData.stockDatas.length > 1 ? rawData.stockDatas[rawData.stockDatas.length - 2] : null;
+
+    return {
+        // 股票基本資訊 (已格式化)
+        stockInfo: formatStockInfo(latestData, previousData, stockId),
+        
+        // 技術指標 (已判斷狀態)
+        indicators: formatIndicators(latestData),
+        
+        // 詳細技術指標 (已格式化)
+        detailedIndicators: formatDetailedIndicators(latestData),
+        
+        // 綜合分析 (已處理完成)
+        analysis: formatAnalysis(rawData.comprehensiveAnalysis, latestData, previousData),
+        
+        // 完整分析建議 (HTML 格式)
+        suggestion: rawData.suggestion
+    };
+}
+
+/**
+ * 格式化股票基本資訊
+ */
+function formatStockInfo(latestData, previousData, stockId) {
+    const priceChange = previousData ? 
+        FinancialIndicators.subtract(latestData.close, previousData.close) : 0;
+    const changePercent = previousData && previousData.close > 0 ? 
+        FinancialIndicators.multiply(FinancialIndicators.divide(priceChange, previousData.close), 100) : 0;
+    
+    const changeText = priceChange !== 0 ? 
+        `${priceChange > 0 ? '+' : ''}${priceChange.toFixed(2)} (${changePercent.toFixed(2)}%)` : 
+        "0.00 (0.00%)";
+    
+    const changeClass = priceChange > 0 ? "positive" : priceChange < 0 ? "negative" : "neutral";
+
+    return {
+        stockId: stockId,
+        date: latestData.date,
+        close: latestData.close.toFixed(2),
+        change: changeText,
+        changeClass: changeClass,
+        volume: latestData.volume.toLocaleString()
+    };
+}
+
+/**
+ * 格式化技術指標
+ */
+function formatIndicators(latestData) {
+    const indicators = [];
+
+    // RSI
+    if (latestData.rsi !== null && latestData.rsi !== undefined) {
+        let status = "中性", statusClass = "neutral";
+        if (latestData.rsi > 70) {
+            status = "超買"; statusClass = "bearish";
+        } else if (latestData.rsi < 30) {
+            status = "超賣"; statusClass = "bullish";
+        }
+        
+        indicators.push({
+            name: "RSI (14)",
+            value: latestData.rsi.toFixed(2),
+            status: status,
+            statusClass: statusClass,
+            description: `RSI ${status === "中性" ? "處於正常區間" : status}`
+        });
+    }
+
+    // MA5
+    if (latestData.ma5 !== null && latestData.ma5 !== undefined) {
+        const isAbove = latestData.close > latestData.ma5;
+        indicators.push({
+            name: "MA5",
+            value: latestData.ma5.toFixed(2),
+            status: isAbove ? "多頭" : "空頭",
+            statusClass: isAbove ? "bullish" : "bearish",
+            description: `價格${isAbove ? "站上" : "跌破"} 5 日均線`
+        });
+    }
+
+    // MA20
+    if (latestData.ma20 !== null && latestData.ma20 !== undefined) {
+        const isAbove = latestData.close > latestData.ma20;
+        indicators.push({
+            name: "MA20",
+            value: latestData.ma20.toFixed(2),
+            status: isAbove ? "多頭" : "空頭",
+            statusClass: isAbove ? "bullish" : "bearish",
+            description: `價格${isAbove ? "站上" : "跌破"} 20 日均線`
+        });
+    }
+
+    // MACD
+    if (latestData.dif !== null && latestData.dif !== undefined) {
+        const isPositive = latestData.dif > 0;
+        indicators.push({
+            name: "MACD",
+            value: latestData.dif.toFixed(4),
+            status: isPositive ? "多頭" : "空頭",
+            statusClass: isPositive ? "bullish" : "bearish",
+            description: `DIF 在零軸${isPositive ? "上方" : "下方"}`
+        });
+    }
+
+    // KD-K
+    if (latestData.k !== null && latestData.k !== undefined) {
+        let status = "中性", statusClass = "neutral";
+        if (latestData.k > 80) {
+            status = "超買"; statusClass = "bearish";
+        } else if (latestData.k < 20) {
+            status = "超賣"; statusClass = "bullish";
+        }
+        
+        indicators.push({
+            name: "KD-K",
+            value: latestData.k.toFixed(2),
+            status: status,
+            statusClass: statusClass,
+            description: `K 值${status === "中性" ? "處於正常區間" : "進入" + status + "區"}`
+        });
+    }
+
+    // KD-D
+    if (latestData.d !== null && latestData.d !== undefined) {
+        let status = "中性", statusClass = "neutral";
+        if (latestData.d > 80) {
+            status = "超買"; statusClass = "bearish";
+        } else if (latestData.d < 20) {
+            status = "超賣"; statusClass = "bullish";
+        }
+        
+        indicators.push({
+            name: "KD-D",
+            value: latestData.d.toFixed(2),
+            status: status,
+            statusClass: statusClass,
+            description: `D 值${status === "中性" ? "處於正常區間" : "進入" + status + "區"}`
+        });
+    }
+
+    // 成交量比
+    if (latestData.volume && latestData.vma5) {
+        const volumeRatio = FinancialIndicators.divide(latestData.volume, latestData.vma5);
+        let status = "正常", statusClass = "neutral";
+        let description = "成交量正常";
+        
+        if (volumeRatio > 1.5) {
+            status = "放量"; statusClass = "bullish";
+            description = `成交量較平均值增加 ${((volumeRatio - 1) * 100).toFixed(0)}%`;
+        } else if (volumeRatio < 0.7) {
+            status = "縮量"; statusClass = "bearish";
+            description = `成交量較平均值減少 ${((1 - volumeRatio) * 100).toFixed(0)}%`;
+        }
+        
+        indicators.push({
+            name: "成交量比",
+            value: volumeRatio.toFixed(2),
+            status: status,
+            statusClass: statusClass,
+            description: description
+        });
+    }
+
+    // 量價關係
+    if (latestData.priceVolumeRelation) {
+        let statusClass = "neutral";
+        let description = "量價關係正常";
+        
+        if (latestData.priceVolumeRelation === "價漲量增") {
+            statusClass = "bullish";
+            description = "健康的上漲格局";
+        } else if (latestData.priceVolumeRelation === "價跌量增") {
+            statusClass = "bearish";
+            description = "可能恐慌性賣壓";
+        } else if (latestData.priceVolumeRelation === "價漲量縮") {
+            statusClass = "neutral";
+            description = "上漲動能不足，留意回檔";
+        } else if (latestData.priceVolumeRelation === "價跌量縮") {
+            statusClass = "neutral";
+            description = "賣壓減輕，可能止跌";
+        }
+        
+        indicators.push({
+            name: "量價關係",
+            value: latestData.priceVolumeRelation,
+            status: latestData.priceVolumeRelation === "價漲量增" ? "健康" : "觀察",
+            statusClass: statusClass,
+            description: description
+        });
+    }
+
+    return indicators;
+}
+
+/**
+ * 格式化詳細技術指標
+ */
+function formatDetailedIndicators(latestData) {
+    return {
+        ema12: latestData.ema12 !== null ? latestData.ema12.toFixed(4) : "計算中",
+        ema26: latestData.ema26 !== null ? latestData.ema26.toFixed(4) : "計算中",
+        macdSignal: latestData.macd !== null ? latestData.macd.toFixed(4) : "計算中",
+        macdOsc: latestData.osc !== null ? latestData.osc.toFixed(4) : "計算中",
+        rsv: latestData.rsv !== null ? latestData.rsv.toFixed(4) : "計算中",
+        vma5: latestData.vma5 !== null ? `${(latestData.vma5 / 1000).toFixed(0)}K股` : "計算中",
+        vma20: latestData.vma20 !== null ? `${(latestData.vma20 / 1000).toFixed(0)}K股` : "計算中",
+        ma10: latestData.ma10 !== null ? latestData.ma10.toFixed(4) : "計算中"
+    };
+}
+
+/**
+ * 格式化綜合分析
+ */
+function formatAnalysis(comprehensiveAnalysis, latestData, previousData) {
+    if (!comprehensiveAnalysis) {
+        return {
+            score: 5.0,
+            riskLevel: "中風險",
+            riskClass: "medium",
+            signals: [],
+            trends: [],
+            momentum: []
+        };
+    }
+
+    // 格式化交易信號
+    const signals = (comprehensiveAnalysis.signals || []).map(signal => ({
+        type: signal.type,
+        typeClass: signal.type === "買進" ? "buy" : "sell",
+        icon: signal.type === "買進" ? "📈" : "📉",
+        reason: signal.reason,
+        strength: signal.strength,
+        strengthClass: signal.strength === "強" ? "strong" : signal.strength === "中" ? "medium" : "weak"
+    }));
+
+    // 風險等級類別
+    const riskClass = comprehensiveAnalysis.riskLevel === "低風險" ? "low" :
+                      comprehensiveAnalysis.riskLevel === "高風險" ? "high" : "medium";
+
+    return {
+        score: comprehensiveAnalysis.score || 5.0,
+        riskLevel: comprehensiveAnalysis.riskLevel || "中風險",
+        riskClass: riskClass,
+        signals: signals,
+        trends: comprehensiveAnalysis.trend || comprehensiveAnalysis.trends || [],
+        momentum: comprehensiveAnalysis.momentum || []
+    };
 }

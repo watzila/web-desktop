@@ -1,11 +1,13 @@
-﻿<section class="appLayout">
+﻿<link href="/css/analysis.css" rel="stylesheet" />
+
+<section class="appLayout show-nav analysis">
     <nav class="nav">
         <menu>
-            <li class="menu-item">
+            <li class="menu-item" onclick="aboutWrap.show();">
                 關於
             </li>
         </menu>
-    </nav>
+    </nav>    
 
     <!-- 分析結果區域 - 使用假資料演示 -->
     <div class="mainArea">
@@ -130,7 +132,7 @@
                     </div>
                     <div class="card-body">
                         <div class="signals-list">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -198,52 +200,23 @@
                     </div>
                 </div>
 
-                <!-- 價格走勢圖表 -->
-                <div class="chart-section notebook-card posGlitchy">
-                    <div class="card-header">
-                        <h3 class="card-title">📈 價格走勢圖 (最近30天)</h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="priceChartContainer" style="width: 100%; height: 400px; margin: 20px 0;">
-                            <!-- 價格走勢圖表 -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RSI 指標圖表 -->
-                <div class="chart-section notebook-card posGlitchy">
-                    <div class="card-header">
-                        <h3 class="card-title">⚡ RSI 相對強弱指標 (最近30天)</h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="rsiChartContainer" style="width: 100%; height: 300px; margin: 20px 0;">
-                            <!-- RSI 圖表 -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 成交量圖表 -->
-                <div class="chart-section notebook-card posGlitchy">
-                    <div class="card-header">
-                        <h3 class="card-title">📊 成交量分析 (最近30天)</h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="volumeChartContainer" style="width: 100%; height: 300px; margin: 20px 0;">
-                            <!-- 成交量圖表 -->
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 策略建議 -->
                 <div class="suggestion-section notebook-card posGlitchy">
                     <div class="card-header">
                         <h3 class="card-title">💡 策略建議</h3>
                     </div>
                     <div class="card-body">
-                        <div id="suggestion" class="suggestion-content">不告訴你<(￣︶￣)> </div>
+                        <div id="suggestion" class="suggestion-content">不告訴你 &lt;(￣︶￣)&gt;</div>
                     </div>
                 </div>
             </div>
+
+            <dialog id="aboutWrap" class="dialog-box">
+                <p>此為AI提供的計算方式和建議<br/>不確定正不正確，僅供參考。</p>
+                <button type="button" class="cancelBTN" onclick="this.closest('dialog').close()"><b>🗙</b></button>
+            </dialog>
+
         </section>
+
     </div>
 </section>
