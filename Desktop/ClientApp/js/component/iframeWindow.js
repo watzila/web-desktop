@@ -33,11 +33,10 @@ class IframeWindow {
                 this.zIndex += 1;
 
                 this.applyStylesBasedOnWidth(windowEle);
-                this.resizable(windowEle);
+                this.resizableAndMoveable(windowEle);
                 this.closeable(windowEle);
                 this.bigable(windowEle);
                 this.smallable(windowEle);
-                this.moveable(windowEle);
                 this.clickable(windowEle);
 
                 this.go(windowEle);
@@ -338,48 +337,6 @@ class IframeWindow {
     }
 
     /**
-     * 視窗拖曳
-     * @param {Element} iframe 視窗元素
-     */
-    moveable(iframe) {
-        const that = this;
-        let isClick = true;
-        let boxLeft = 0;
-        let boxTop = 0;
-
-        iframe.querySelector("header>div.title").addEventListener("mousedown",
-            function (e) {
-                if (isClick && that.currentWindow != iframe) {
-                    that.currentWindow = iframe;
-                    iframe.style.zIndex = that.zIndex;
-                    that.zIndex++;
-                    isClick = false;
-                }
-
-                boxLeft = e.clientX - this.parentNode.getBoundingClientRect().left;
-                boxTop = e.clientY - this.parentNode.getBoundingClientRect().top;
-                iframe.classList.toggle("dragging");
-
-                window.addEventListener("mousemove", move);
-                window.addEventListener("mouseup", stopMove);
-
-                that.navSticky();
-            });
-
-        function move(e) {
-            iframe.style.top = e.clientY - boxTop + "px";
-            iframe.style.left = e.clientX - boxLeft + "px";
-        }
-
-        function stopMove() {
-            isClick = true;
-            iframe.classList.toggle("dragging");
-            window.removeEventListener("mousemove", move);
-            window.removeEventListener("mouseup", stopMove);
-        }
-    }
-
-    /**
      * 視窗點擊
      * @param {Element} iframe 視窗元素
      */
@@ -445,11 +402,10 @@ class IframeWindow {
                 this.zIndex += 1;
 
                 this.applyStylesBasedOnWidth(windowEle);
-                this.resizable(windowEle);
+                this.resizableAndMoveable(windowEle);
                 this.closeable(windowEle);
                 this.bigable(windowEle);
                 this.smallable(windowEle);
-                this.moveable(windowEle);
                 this.clickable(windowEle);
 
                 this.go(windowEle);
@@ -514,85 +470,175 @@ class IframeWindow {
     }
 
     /**
-     * 視窗改變大小
+     * 視窗改變大小、拖曳
      * @param {Element} iframe 視窗元素
      */
-    resizable(iframe) {
+    resizableAndMoveable(iframe) {
         const that = this;
-        const resizers = iframe.querySelectorAll(".resizer");
         const minimumSize = 350;
-        let originalW = 0;
-        let originalH = 0;
-        let originalX = 0;
-        let originalY = 0;
-        let originalMouseX = 0;
-        let originalMouseY = 0;
+        const MARGINS = 15; // 邊緣偵測範圍
 
-        for (let i = 0; i < resizers.length; i++) {
-            const currentResizer = resizers[i];
-            currentResizer.addEventListener("mousedown", function (e) {
-                e.preventDefault();
-                originalW = parseFloat(getComputedStyle(iframe).getPropertyValue("width").replace("px", ""));
-                originalH = parseFloat(getComputedStyle(iframe).getPropertyValue("height").replace("px", ""));
-                originalX = iframe.getBoundingClientRect().left;
-                originalY = iframe.getBoundingClientRect().top;
-                originalMouseX = e.pageX;
-                originalMouseY = e.pageY;
-                window.addEventListener("mousemove", resize);
-                window.addEventListener("mouseup", stopResize);
-            });
+        let clicked = null;
+        let onRightEdge, onBottomEdge, onLeftEdge, onTopEdge;
+        let b, x, y, e;
+        let redraw = false;
+        let isClick = true;
 
-            function resize(e) {
-                if (currentResizer.classList.contains("bottomRight")) {
-                    const width = originalW + (e.pageX - originalMouseX);
-                    const height = originalH + (e.pageY - originalMouseY);
+        // 計算滑鼠位置和邊緣狀態
+        function calc(event) {
+            b = iframe.getBoundingClientRect();
+            x = event.clientX - b.left;
+            y = event.clientY - b.top;
+
+            onTopEdge = y < MARGINS;
+            onLeftEdge = x < MARGINS;
+            onRightEdge = x >= b.width - MARGINS;
+            onBottomEdge = y >= b.height - MARGINS;
+        }
+
+        // 判斷是否可以移動（在標題列區域）
+        function canMove(event) {
+            const header = iframe.querySelector("header>div.title");
+            if (!header) return false;
+
+            const headerRect = header.getBoundingClientRect();
+            return event.clientX >= headerRect.left &&
+                event.clientX <= headerRect.right &&
+                event.clientY >= headerRect.top &&
+                event.clientY <= headerRect.bottom;
+        }
+
+        // 滑鼠按下
+        function onMouseDown(event) {
+            calc(event);
+
+            const isResizing = onRightEdge || onBottomEdge || onTopEdge || onLeftEdge;
+            const isMoving = !isResizing && canMove(event);
+
+            // 如果既不是 resize 也不是 move，就不處理
+            if (!isResizing && !isMoving) return;
+
+            // 切換視窗焦點（只在移動時）
+            if (isMoving && isClick && that.currentWindow != iframe) {
+                that.currentWindow = iframe;
+                iframe.style.zIndex = that.zIndex;
+                that.zIndex++;
+                isClick = false;
+            }
+
+            clicked = {
+                cx: event.clientX,
+                cy: event.clientY,
+                x: x,
+                y: y,
+                w: b.width,
+                h: b.height,
+                isResizing: isResizing,
+                isMoving: isMoving,
+                onTopEdge: onTopEdge,
+                onLeftEdge: onLeftEdge,
+                onRightEdge: onRightEdge,
+                onBottomEdge: onBottomEdge
+            };
+
+            if (isMoving) {
+                iframe.classList.add("dragging");
+                that.navSticky();
+            }
+
+            event.preventDefault();
+        }
+
+        // 滑鼠移動
+        function onMouseMove(event) {
+            calc(event);
+            e = event;
+            redraw = true;
+        }
+
+        // 滑鼠放開
+        function onMouseUp(event) {
+            if (clicked && clicked.isMoving) {
+                isClick = true;
+                iframe.classList.remove("dragging");
+            }
+            clicked = null;
+        }
+
+        // 動畫循環
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (!redraw) return;
+            redraw = false;
+
+            // Resize 邏輯
+            if (clicked && clicked.isResizing) {
+
+                // 右邊緣
+                if (clicked.onRightEdge) {
+                    const width = Math.max(x, minimumSize);
+                    iframe.style.width = width + 'px';
+                }
+
+                // 下邊緣
+                if (clicked.onBottomEdge) {
+                    const height = Math.max(y, minimumSize);
+                    iframe.style.height = height + 'px';
+                }
+
+                // 左邊緣
+                if (clicked.onLeftEdge) {
+                    const width = Math.max(clicked.cx - e.clientX + clicked.w, minimumSize);
                     if (width > minimumSize) {
-                        iframe.style.width = width + "px";
+                        iframe.style.width = width + 'px';
+                        iframe.style.left = e.clientX + 'px';
                     }
+                }
+
+                // 上邊緣
+                if (clicked.onTopEdge) {
+                    const height = Math.max(clicked.cy - e.clientY + clicked.h, minimumSize);
                     if (height > minimumSize) {
-                        iframe.style.height = height + "px";
-                    }
-                } else if (currentResizer.classList.contains("bottomLeft")) {
-                    const width = originalW - (e.pageX - originalMouseX);
-                    const height = originalH + (e.pageY - originalMouseY);
-                    if (width > minimumSize) {
-                        iframe.style.width = width + "px";
-                        iframe.style.left = originalX + (e.pageX - originalMouseX) + 'px'
-                    }
-                    if (height > minimumSize) {
-                        iframe.style.height = height + "px";
-                    }
-                } else if (currentResizer.classList.contains("topRight")) {
-                    const width = originalW + (e.pageX - originalMouseX);
-                    const height = originalH - (e.pageY - originalMouseY);
-                    if (width > minimumSize) {
-                        iframe.style.width = width + "px";
-                    }
-                    if (height > minimumSize) {
-                        iframe.style.height = height + "px";
-                        iframe.style.top = originalY + (e.pageY - originalMouseY) + 'px'
-                    }
-                } else if (currentResizer.classList.contains("topLeft")) {
-                    const width = originalW - (e.pageX - originalMouseX);
-                    const height = originalH - (e.pageY - originalMouseY);
-                    if (width > minimumSize) {
-                        iframe.style.width = width + "px";
-                        iframe.style.left = originalX + (e.pageX - originalMouseX) + 'px'
-                    }
-                    if (height > minimumSize) {
-                        iframe.style.height = height + "px";
-                        iframe.style.top = originalY + (e.pageY - originalMouseY) + 'px'
+                        iframe.style.height = height + 'px';
+                        iframe.style.top = e.clientY + 'px';
                     }
                 }
 
                 that.applyStylesBasedOnWidth(iframe);
+                return;
             }
 
-            function stopResize() {
-                window.removeEventListener("mousemove", resize);
+            // Move 邏輯
+            if (clicked && clicked.isMoving) {
+                iframe.style.top = (e.clientY - clicked.y) + 'px';
+                iframe.style.left = (e.clientX - clicked.x) + 'px';
+                return;
             }
 
+            // 游標樣式（沒有按下滑鼠時）
+            if (onRightEdge && onBottomEdge || onLeftEdge && onTopEdge) {
+                iframe.style.cursor = 'nwse-resize';
+            } else if (onRightEdge && onTopEdge || onBottomEdge && onLeftEdge) {
+                iframe.style.cursor = 'nesw-resize';
+            } else if (onRightEdge || onLeftEdge) {
+                iframe.style.cursor = 'ew-resize';
+            } else if (onBottomEdge || onTopEdge) {
+                iframe.style.cursor = 'ns-resize';
+            } else if (canMove(e)) {
+                iframe.style.cursor = 'move';
+            } else {
+                iframe.style.cursor = 'default';
+            }
         }
+
+        // 綁定事件
+        iframe.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+
+        // 啟動動畫循環
+        animate();
     }
 
 }

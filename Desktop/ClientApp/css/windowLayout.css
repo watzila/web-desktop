@@ -92,39 +92,6 @@
   border-radius: 50%;
 }
 
-.resizer {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: transparent;
-  /*border: 3px solid #4286f4;*/
-}
-
-.resizer.topLeft {
-  left: -5px;
-  top: -5px;
-  cursor: nwse-resize;
-}
-
-.resizer.topRight {
-  right: -5px;
-  top: -5px;
-  cursor: nesw-resize;
-}
-
-.resizer.bottomLeft {
-  left: -5px;
-  bottom: -5px;
-  cursor: nesw-resize;
-}
-
-.resizer.bottomRight {
-  right: -5px;
-  bottom: -5px;
-  cursor: nwse-resize;
-}
-
 .function {
   flex-grow: 0;
   flex-shrink: 0;
@@ -181,18 +148,31 @@ textarea {
   height: 100%;
 }
 
-.menu-item {
-  position: relative;
-  height: 100%;
-  padding: 5px 10px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  user-select: none;
-}
+    .nav menu::before {
+        content: '';
+        position: absolute;
+        position-anchor: --anchor-select;
+        left: anchor(left);
+        top: anchor(top);
+        width: anchor-size(width);
+        min-height: 1.8rem;
+        transition: .2s ease-in-out;
+        box-shadow: inset 0 0 8px color-mix(in srgb, #54babd 80%, transparent);
+        pointer-events: none;
+    }
 
-.menu-item:hover {
-  background-color: #ddd;
-}
+    .menu-item {
+        position: relative;
+        height: 100%;
+        padding: 5px 10px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .menu-item:hover {
+            anchor-name: --anchor-select;
+        }
 
 .menu-item:hover .dropdown {
   display: block;
@@ -254,3 +234,23 @@ textarea {
   flex: 1;
   width: 100%;
 }
+
+.appLayout dialog.dialog-box {
+    top: 25%;
+    min-width: 300px;
+    margin: auto;
+    padding: 1rem;
+    border: 2px dashed #aaa;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+    .appLayout dialog.dialog-box .closeBTN {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 5px;
+        font-size: 1rem;
+        line-height: 1rem;
+    }

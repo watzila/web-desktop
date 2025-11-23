@@ -1,6 +1,6 @@
 {
     "name": "DesktopDB",
-    "version": 4,
+    "version": 5,
     "schemas": [
         {
             "name": "ACLObject",
@@ -83,6 +83,10 @@
                 },
                 {
                     "keyPath": "source",
+                    "options": { "unique": false }
+                },
+                {
+                    "keyPath": "handle",
                     "options": { "unique": false }
                 }
             ],

@@ -6,6 +6,7 @@ class Twse extends BaseComponent {
         super(id);
         this.searchBTN = this.iframe.querySelector("#searchBTN");
         this.suggestionEle = this.iframe.querySelector("#suggestion");
+        this.navEle = this.iframe.querySelector("nav");
         this.init();
     }
 
@@ -31,6 +32,10 @@ class Twse extends BaseComponent {
             }).catch(error => {
                 eventBus.emit("error", error.message);
             });
+        });
+
+        this.setEvent(this.navEle.querySelector("#aboutBTN"), "click", () => {
+            this.iframe.querySelector("#aboutWrap").show();
         });
     }
 
@@ -172,16 +177,12 @@ class Twse extends BaseComponent {
         signals.forEach(signal => {
             const signalElement = document.createElement("div");
             signalElement.className = `signal-item ${signal.typeClass}`;
-
-            const strengthText = signal.strength === "強" ? "強烈" : signal.strength === "中" ? "中等" : "弱";
-
             signalElement.innerHTML = `
                 <div class="signal-content">
                     <div class="signal-type">${signal.icon} ${signal.type}</div>
                     <div class="signal-reason">${signal.reason}</div>
                 </div>
-                <div class="signal-strength ${signal.strengthClass}">${strengthText}</div>
-            `;
+                <div class="signal-strength ${signal.strengthClass}">${signal.strength}</div>`;
             signalsContainer.appendChild(signalElement);
         });
     }

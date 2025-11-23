@@ -14,19 +14,17 @@
                             <div class="dropdown">
                                 <button class="dropBTN" title="新增音樂"><i class="icofont-plus"></i> &ensp;新增音樂</button>
                                 <div class="dropdown-content">
-                                    <button id="addFileBTN" title="上傳檔案"><i class="icofont-folder-open"></i>&ensp;上傳檔案</button>
-                                    <button id="addYouTubeBTN" title="輸入Youtube連結"><i class="icofont-link"></i>&ensp;輸入Youtube連結</button>
+                                    <button id="addFileBTN" title="上傳檔案"><i class="icofont-folder-open"></i>&ensp;本機檔案</button>
+                                    <button id="addYouTubeBTN" title="輸入連結"><i class="icofont-link"></i>&ensp;輸入連結</button>
                                 </div>
                             </div>
-
-                            <input type="file" class="musicFileInput closed" accept="audio/*">
                         </div>
                     </div>
 
                     <ul class="playlist">
                         {{#each data}}
                         <li>
-                            <span data-path="{{path}}">{{name}}</span>
+                            <span data-id="{{id}}">{{name}}</span>
                             <button class="removeMusicBTN" value="{{id}}" data-source="{{source}}"><b>&#128473;</b></button>
                         </li>
                         {{/each}}
@@ -69,7 +67,7 @@
             <input type="text" name="url" autocomplete="off" required />
 
             <div class="dialog-actions">
-                <button type="button" class="cancelBTN" onclick="this.closest('dialog').close()">取消</button>
+                <button type="button" class="closeBTN" onclick="this.closest('dialog').close()">取消</button>
                 <button id="addUrlBTN" class="confirmBTN">新增</button>
             </div>
         </form>

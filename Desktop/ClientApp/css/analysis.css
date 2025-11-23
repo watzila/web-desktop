@@ -419,26 +419,6 @@
     }
 }
 
-.analysis dialog.dialog-box {
-    top: 25%;
-    min-width: 300px;
-    margin: auto;
-    padding: 1rem;
-    border: 2px dashed #aaa;
-    border-radius: 5px;
-    background: #fff;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-}
-
-.analysis dialog.dialog-box .cancelBTN {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 5px;
-    font-size: 1rem;
-    line-height: 1rem;
-}
-
 /* 響應式設計 */
 @media (max-width: 768px) {
     .analysis .input-group {

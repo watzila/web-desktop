@@ -12,12 +12,23 @@ class Aquarium extends BaseComponent {
         this.pellets = [];
         this.lastTime;
         this.fishImg = new Image();
+        this.resizeObserver;
+        this.navEle = this.iframe.querySelector("nav");
 
         this.init();
     }
 
     init() {
         this.fishImg.src = './images/fish1.png';
+        // 設定初始 canvas 尺寸
+        this.resizeCanvas();
+
+        // 監聽視窗大小變化
+        this.resizeObserver = new ResizeObserver(() => {
+            this.resizeCanvas();
+        });
+        this.resizeObserver.observe(this.iframe);
+
         // 初始魚
         for (let i = 0; i < 3; i++) {
             this.fishes.push(new Fish(100 + i * 200, 100 + Math.random() * 100));
@@ -30,6 +41,18 @@ class Aquarium extends BaseComponent {
 
         this.lastTime = performance.now();
         requestAnimationFrame(this.gameLoop.bind(this));
+
+        this.setEvent(this.navEle.querySelector("#aboutBTN"), "click", () => {
+            this.iframe.querySelector("#aboutWrap").show();
+        });
+    }
+
+    resizeCanvas() {
+        const rect = this.canvas.parentNode.getBoundingClientRect();
+
+        // 設定 canvas 實際像素尺寸等於顯示尺寸
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
     }
 
     gameLoop(now) {
@@ -44,11 +67,21 @@ class Aquarium extends BaseComponent {
         }
 
         for (const fish of this.fishes) {
-            fish.update(this.canvas, deltaTime, this.pellets, this.coins, this.coinEle);
+            fish.update(this.canvas, deltaTime, this.pellets, () => {
+                this.coins += 1;
+                this.coinEle.innerText = this.coins;
+            });
             fish.draw(this.ctx, this.fishImg);
         }
 
         requestAnimationFrame(this.gameLoop.bind(this));
+    }
+
+    destroy() {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
+        super.destroy();
     }
 
 }
@@ -76,7 +109,7 @@ class Fish {
         this.targetPellet = null;
     }
 
-    update(canvas, deltaTime, pellets, coins, coinEle) {
+    update(canvas, deltaTime, pellets, fn) {
         if (this.targetPellet && !pellets.includes(this.targetPellet)) {
             this.targetPellet = null;
         }
@@ -150,8 +183,7 @@ class Fish {
 
         this.coinTimer += deltaTime;
         if (this.coinTimer >= this.coinInterval) {
-            coins += 1;
-            coinEle.innerText = coins;
+            fn();
             this.coinTimer = 0;
         }
 

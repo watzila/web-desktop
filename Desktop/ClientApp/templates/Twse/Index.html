@@ -3,7 +3,7 @@
 <section class="appLayout show-nav analysis">
     <nav class="nav">
         <menu>
-            <li class="menu-item" onclick="aboutWrap.show();">
+            <li class="menu-item" id="aboutBTN">
                 關於
             </li>
         </menu>
@@ -213,7 +213,7 @@
 
             <dialog id="aboutWrap" class="dialog-box">
                 <p>此為AI提供的計算方式和建議<br/>不確定正不正確，僅供參考。</p>
-                <button type="button" class="cancelBTN" onclick="this.closest('dialog').close()"><b>🗙</b></button>
+                <button type="button" class="closeBTN" onclick="this.closest('dialog').close()"><b>🗙</b></button>
             </dialog>
 
         </section>

@@ -91,15 +91,15 @@ async function getClosePrices(stockNo, yyyymmdd) {
             close: parseFloat(row[6].replace(/,/g, '')) || 0,
             volume: parseInt(row[1].replace(/,/g, '')) || 0,
             ma5: null,
+            ma10: null,
             ma20: null,
+            ma60: null,
             rsi: null,
             ema12: null,
             ema26: null,
             dif: null,
             macd: null,
             osc: null,
-            ma10: null,
-            ma60: null,
             priceChange: null,
             gain: null,
             loss: null,
@@ -128,7 +128,7 @@ function convertDate(rocDateStr) {
     const yyyy = year + 1911;
     const mm = parts[1];
     const dd = parts[2];
-    return `${yyyy}-${mm}-${dd}`; // 使用 YYYY-MM-DD 以提升 new Date 解析穩定性
+    return `${yyyy}-${mm}-${dd}`;
 }
 
 function analyzeResult(data) {
@@ -1048,59 +1048,175 @@ class FinancialIndicators {
     }
 
     /**
-     * 生成交易信號
-     */
+ * 生成交易信號
+ * @param {Object} latest - 最新一筆數據
+ * @param {Object} previous - 前一筆數據
+ * @param {Array} recent - 最近5筆數據 (包含 latest)
+ */
     generateSignals(latest, previous, recent = []) {
         const signals = [];
 
-        // MA 交叉信號（去雜訊：要求交叉後仍維持，且跨越幅度至少 0.1%）
+        // MA 交叉信號
         if (previous && latest.ma5 && latest.ma20 && previous.ma5 && previous.ma20) {
             const crossedUp = previous.ma5 <= previous.ma20 && latest.ma5 > latest.ma20;
             const crossedDown = previous.ma5 >= previous.ma20 && latest.ma5 < latest.ma20;
+
+            // 計算交叉強度（價差百分比）
             const crossStrength = FinancialIndicators.divide(
                 Math.abs(FinancialIndicators.subtract(latest.ma5, latest.ma20)),
                 latest.ma20
             );
 
-            const sustainedUp = crossedUp && recent.length >= 2
-                ? recent.slice(-2).every(x => x.ma5 && x.ma20 ? x.ma5 >= x.ma20 : true)
-                : crossedUp;
-            const sustainedDown = crossedDown && recent.length >= 2
-                ? recent.slice(-2).every(x => x.ma5 && x.ma20 ? x.ma5 <= x.ma20 : true)
-                : crossedDown;
+            // 檢查交叉前是否有趨勢醞釀（過濾假突破）
+            let trendConfirmed = true;
+            if (recent.length >= 4) {
+                // 取交叉前的2-3筆數據（排除 latest 和 previous）
+                // recent 結構: [第-5筆, 第-4筆, 第-3筆, previous, latest]
+                const beforeCross = recent.slice(0, -2); // 取前3筆
 
-            if (sustainedUp && crossStrength >= 0.001) {
-                signals.push({ type: "買進", reason: "MA黃金交叉（維持）", strength: crossStrength > 0.005 ? "強" : "中" });
-            } else if (sustainedDown && crossStrength >= 0.001) {
-                signals.push({ type: "賣出", reason: "MA死亡交叉（維持）", strength: crossStrength > 0.005 ? "強" : "中" });
+                if (crossedUp && beforeCross.length >= 2) {
+                    // 黃金交叉：檢查交叉前 ma5 是否逐漸接近 ma20
+                    for (let i = 1; i < beforeCross.length; i++) {
+                        if (!beforeCross[i].ma5 || !beforeCross[i].ma20) continue;
+                        const prevGap = beforeCross[i - 1].ma20 - beforeCross[i - 1].ma5;
+                        const currGap = beforeCross[i].ma20 - beforeCross[i].ma5;
+                        // 只要還在下方且差距沒有擴大，就算趨勢確認
+                        if (currGap < 0 || currGap > prevGap * 1.2) {
+                            trendConfirmed = false;
+                            break;
+                        }
+                    }
+                } else if (crossedDown && beforeCross.length >= 2) {
+                    // 死亡交叉：檢查交叉前 ma5 是否逐漸遠離 ma20
+                    for (let i = 1; i < beforeCross.length; i++) {
+                        if (!beforeCross[i].ma5 || !beforeCross[i].ma20) continue;
+                        const prevGap = beforeCross[i - 1].ma5 - beforeCross[i - 1].ma20;
+                        const currGap = beforeCross[i].ma5 - beforeCross[i].ma20;
+                        // 只要還在上方且差距沒有擴大，就算趨勢確認
+                        if (currGap < 0 || currGap > prevGap * 1.2) {
+                            trendConfirmed = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 根據交叉強度和趨勢確認產生信號
+            if (crossedUp && crossStrength >= 0.001) {
+                let strength = "弱";
+                if (trendConfirmed && crossStrength >= 0.005) {
+                    strength = "強";
+                } else if (trendConfirmed || crossStrength >= 0.003) {
+                    strength = "中";
+                }
+                signals.push({
+                    type: "買進",
+                    reason: "MA黃金交叉" + (trendConfirmed ? "（趨勢確認）" : ""),
+                    strength
+                });
+            } else if (crossedDown && crossStrength >= 0.001) {
+                let strength = "弱";
+                if (trendConfirmed && crossStrength >= 0.005) {
+                    strength = "強";
+                } else if (trendConfirmed || crossStrength >= 0.003) {
+                    strength = "中";
+                }
+                signals.push({
+                    type: "賣出",
+                    reason: "MA死亡交叉" + (trendConfirmed ? "（趨勢確認）" : ""),
+                    strength
+                });
             }
         }
 
-        // MACD 信號（去雜訊：交叉後連續維持，且 OSC 同向配合）
+        // MACD 信號
         if (previous && latest.dif != null && latest.macd != null && previous.dif != null && previous.macd != null) {
             const crossedUp = previous.dif <= previous.macd && latest.dif > latest.macd;
             const crossedDown = previous.dif >= previous.macd && latest.dif < latest.macd;
 
-            const sustainedUp = crossedUp && recent.length >= 2
-                ? recent.slice(-2).every(x => (x.dif != null && x.macd != null) ? x.dif >= x.macd : true)
-                : crossedUp;
-            const sustainedDown = crossedDown && recent.length >= 2
-                ? recent.slice(-2).every(x => (x.dif != null && x.macd != null) ? x.dif <= x.macd : true)
-                : crossedDown;
+            // 計算 MACD 交叉強度
+            const macdStrength = latest.osc != null ? Math.abs(latest.osc) : 0;
 
-            if (sustainedUp && latest.osc > 0) {
-                signals.push({ type: "買進", reason: "MACD黃金交叉（維持且動能正）", strength: "中" });
-            } else if (sustainedDown && latest.osc < 0) {
-                signals.push({ type: "賣出", reason: "MACD死亡交叉（維持且動能負）", strength: "中" });
+            // 檢查 MACD 趨勢確認
+            let macdTrendConfirmed = true;
+            if (recent.length >= 4) {
+                const beforeCross = recent.slice(0, -2);
+
+                if (crossedUp && beforeCross.length >= 2) {
+                    // 黃金交叉：檢查 DIF 是否逐漸上升
+                    for (let i = 1; i < beforeCross.length; i++) {
+                        if (beforeCross[i].dif == null || beforeCross[i - 1].dif == null) continue;
+                        if (beforeCross[i].dif < beforeCross[i - 1].dif) {
+                            macdTrendConfirmed = false;
+                            break;
+                        }
+                    }
+                } else if (crossedDown && beforeCross.length >= 2) {
+                    // 死亡交叉：檢查 DIF 是否逐漸下降
+                    for (let i = 1; i < beforeCross.length; i++) {
+                        if (beforeCross[i].dif == null || beforeCross[i - 1].dif == null) continue;
+                        if (beforeCross[i].dif > beforeCross[i - 1].dif) {
+                            macdTrendConfirmed = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 產生 MACD 信號
+            if (crossedUp && latest.osc != null) {
+                let strength = "弱";
+                if (macdTrendConfirmed && latest.osc > 0 && macdStrength >= 0.5) {
+                    strength = "強";
+                } else if ((macdTrendConfirmed && latest.osc > 0) || macdStrength >= 0.3) {
+                    strength = "中";
+                }
+                signals.push({
+                    type: "買進",
+                    reason: "MACD黃金交叉" + (latest.osc > 0 ? "（動能正）" : ""),
+                    strength
+                });
+            } else if (crossedDown && latest.osc != null) {
+                let strength = "弱";
+                if (macdTrendConfirmed && latest.osc < 0 && macdStrength >= 0.5) {
+                    strength = "強";
+                } else if ((macdTrendConfirmed && latest.osc < 0) || macdStrength >= 0.3) {
+                    strength = "中";
+                }
+                signals.push({
+                    type: "賣出",
+                    reason: "MACD死亡交叉" + (latest.osc < 0 ? "（動能負）" : ""),
+                    strength
+                });
             }
         }
 
-        // RSI 極值信號
+        // RSI 極值信號（加入強度分級）
         if (latest.rsi != null) {
             if (latest.rsi < 30) {
-                signals.push({ type: "買進", reason: "RSI超賣反彈", strength: "中" });
+                let strength = "中";
+                if (latest.rsi < 20) {
+                    strength = "強";
+                } else if (latest.rsi >= 25) {
+                    strength = "弱";
+                }
+                signals.push({
+                    type: "買進",
+                    reason: `RSI超賣反彈 (${latest.rsi.toFixed(1)})`,
+                    strength
+                });
             } else if (latest.rsi > 70) {
-                signals.push({ type: "賣出", reason: "RSI超買回檔", strength: "中" });
+                let strength = "中";
+                if (latest.rsi > 80) {
+                    strength = "強";
+                } else if (latest.rsi <= 75) {
+                    strength = "弱";
+                }
+                signals.push({
+                    type: "賣出",
+                    reason: `RSI超買回檔 (${latest.rsi.toFixed(1)})`,
+                    strength
+                });
             }
         }
 
