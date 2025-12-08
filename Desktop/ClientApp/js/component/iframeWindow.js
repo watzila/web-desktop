@@ -506,7 +506,6 @@ class IframeWindow {
 
         // 滑鼠按下
         function onMouseDown(event) {
-            event.preventDefault();
             if (that.currentWindow.classList.contains("fillWindow")) return;
             calc(event);
 
@@ -543,6 +542,8 @@ class IframeWindow {
                 iframe.classList.add("dragging");
                 that.navSticky();
             }
+
+            event.preventDefault();
         }
 
         // 滑鼠移動
