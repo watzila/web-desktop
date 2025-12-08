@@ -79,11 +79,13 @@ async function getClosePrices(stockNo, yyyymmdd) {
     }
 
     const result = [];
+    const title = data.title || `股票代號 ${stockNo}`;
     for (const row of data.data) {
         const date = convertDate(row[0]);
         if (!date) continue;
 
         result.push({
+            title,
             date,
             open: parseFloat(row[3].replace(/,/g, '')) || 0,
             high: parseFloat(row[4].replace(/,/g, '')) || 0,
@@ -1299,7 +1301,7 @@ function formatDataForFrontend(rawData, stockId) {
 
     return {
         // 股票基本資訊 (已格式化)
-        stockInfo: formatStockInfo(latestData, previousData, stockId),
+        stockInfo: formatStockInfo(latestData, previousData),
         
         // 技術指標 (已判斷狀態)
         indicators: formatIndicators(latestData),
@@ -1318,7 +1320,8 @@ function formatDataForFrontend(rawData, stockId) {
 /**
  * 格式化股票基本資訊
  */
-function formatStockInfo(latestData, previousData, stockId) {
+function formatStockInfo(latestData, previousData) {
+    const match = latestData.title.match(/\s.*\s/);
     const priceChange = previousData ? 
         FinancialIndicators.subtract(latestData.close, previousData.close) : 0;
     const changePercent = previousData && previousData.close > 0 ? 
@@ -1331,7 +1334,7 @@ function formatStockInfo(latestData, previousData, stockId) {
     const changeClass = priceChange > 0 ? "positive" : priceChange < 0 ? "negative" : "neutral";
 
     return {
-        stockId: stockId,
+        title: match ? match[0].trim() : latestData.title,
         date: latestData.date,
         close: latestData.close.toFixed(2),
         change: changeText,

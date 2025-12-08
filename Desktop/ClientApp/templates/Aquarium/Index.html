@@ -21,7 +21,7 @@
     </nav>
 
     <div class="mainArea">
-        <section class="content pad0" style="position:relative;">
+        <section class="content pad0">
             <canvas id="aquarium" class="fill100" style="vertical-align:middle;background: #a7d8ff; border-radius: 0 0 16px 16px; cursor: pointer;"></canvas>
             <div style="position:absolute;bottom:0;left:0;">
                 <p>金幣：<span id="coins">100</span></p>
@@ -32,5 +32,59 @@
     <dialog id="aboutWrap" class="dialog-box">
         <p>此功能為AI撰寫，我只負責出一張嘴。</p>
         <button type="button" class="closeBTN" onclick="this.closest('dialog').close()"><b>🗙</b></button>
+    </dialog>
+
+    <!-- 轉蛋對話框 -->
+    <dialog id="gachaWrap" class="dialog-box" style="min-width: 400px; padding: 24px;">
+        <h3 style="margin: 0 0 16px 0; text-align: center;">🎰 轉蛋機</h3>
+        <button type="button" class="closeBTN" onclick="this.closest('dialog').close()" style="top: 8px; right: 8px;"><b>🗙</b></button>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p style="font-size: 14px; color: #666;">使用金幣抽取不同稀有度的魚類！</p>
+            <p style="font-size: 18px; font-weight: bold;">當前金幣: <span id="gachaCoins">100</span> 💰</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- 基礎轉蛋 -->
+            <button id="basicGachaBTN" class="gacha-btn" style="padding: 16px; border: 2px solid #ccc; border-radius: 8px; background: white; cursor: pointer; transition: all 0.3s;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="text-align: left;">
+                        <div style="font-size: 16px; font-weight: bold;">基礎轉蛋</div>
+                        <div style="font-size: 12px; color: #666;">抽取一隻隨機魚類</div>
+                    </div>
+                    <div style="font-size: 18px; font-weight: bold; color: #F39C12;">100 💰</div>
+                </div>
+            </button>
+
+            <!-- 十連抽 -->
+            <button id="tenGachaBTN" class="gacha-btn" style="padding: 16px; border: 2px solid #9B59B6; border-radius: 8px; background: linear-gradient(135deg, #f5f5f5, #e8e8e8); cursor: pointer; transition: all 0.3s;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="text-align: left;">
+                        <div style="font-size: 16px; font-weight: bold; color: #9B59B6;">十連抽 ⭐</div>
+                        <div style="font-size: 12px; color: #666;">抽取10隻魚，第10隻保底稀有！</div>
+                    </div>
+                    <div style="font-size: 18px; font-weight: bold; color: #9B59B6;">900 💰</div>
+                </div>
+            </button>
+        </div>
+
+        <div style="margin-top: 16px; padding: 12px; background: #f9f9f9; border-radius: 8px; font-size: 12px;">
+            <div><b>機率說明：</b></div>
+            <div>⚪ 普通 (60%) | 🔵 稀有 (25%) | 🟣 史詩 (12%) | 🟡 傳說 (3%)</div>
+        </div>
+    </dialog>
+
+    <!-- 轉蛋結果對話框 -->
+    <dialog id="gachaResultWrap" class="dialog-box" style="min-width: 350px; padding: 24px; text-align: center;">
+        <h3 style="margin: 0 0 16px 0;">✨ 恭喜獲得！✨</h3>
+        <button type="button" class="closeBTN" onclick="this.closest('dialog').close()" style="top: 8px; right: 8px;"><b>🗙</b></button>
+
+        <div id="gachaResultContent" style="padding: 20px;">
+            <!-- 結果內容將由 JavaScript 動態填充 -->
+        </div>
+
+        <button id="addFishToTankBTN" style="padding: 12px 24px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 16px;">
+            放入水族箱 🐠
+        </button>
     </dialog>
 </section>

@@ -12,22 +12,13 @@ class Text extends BaseComponent {
     }
 
     init() {
-        this.originContent = this.contentEle.value;
-
         this.setEvent(this.saveBTN, "click", () => {
-            try {
-                const form = this.iframe.querySelector("form");
-                Ajax.conn({
-                    type: "post", url: "/api/File/SaveText", data: new FormData(form), fn: () => {
-                        const title = this.iframe.querySelector("header>.title h4").innerText;
-                        eventBus.emit("info", JSON.stringify({ title: title, msg: "儲存成功" }));
-                    }
-                }).catch(error => {
-                    eventBus.emit("error", error.message);
-                });
-            } catch (error) {
+            const form = this.iframe.querySelector("form");
+            Ajax.conn({
+                type: "post", url: "/api/File/SaveText", data: new FormData(form)
+            }).catch(error => {
                 eventBus.emit("error", error.message);
-            }
+            });
         });
 
         this.setEvent(this.closeBTN, "click", () => {

@@ -23,9 +23,7 @@ class Ajax {
 
         if (this.enableOffline && /^\/api\/.*/.test(url)) {
             if (!this.db) await this.init();
-            const result = await this.db.conn(url, data);
-            //console.log(result);
-            fn(result);
+            await this.db.conn(url, data).then(result => fn(result)).catch(error => { throw error; });
             return;
         }
 

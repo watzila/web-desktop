@@ -27,6 +27,6 @@
     },
     "/api/Music/Delete": async (ctx, data) => {
         const db = await ctx.getDBInstance();
-        ctx.deleteStore(db, "Music", data.id);
+        await ctx.deleteStore(db, "Music", data.id);
     }
 };

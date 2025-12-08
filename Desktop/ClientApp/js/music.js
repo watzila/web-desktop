@@ -64,7 +64,10 @@ class Music extends BaseComponent {
                     case "youtube":
                         await Ajax.conn({
                             type: "get", url: "https://noembed.com/embed", data: { dataType: "json", url: data.path }, fn: (res) => {
-                                if (!res || !res.title) throw new Error(JSON.stringify({ title: data.path, msg: "✖無法取得影片資訊" }));
+                                if (!res || !res.title) {
+                                    eventBus.emit("error", JSON.stringify({ title: data.path, msg: "✖無法取得影片資訊" }));
+                                    return;
+                                }
 
                                 data.name = res.title;
                             }

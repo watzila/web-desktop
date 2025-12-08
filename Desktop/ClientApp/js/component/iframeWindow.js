@@ -84,10 +84,6 @@ class IframeWindow {
                 Ajax.conn({
                     type: "post", url: target.dataset.href, data: { id: target.dataset.value }, fn: async (res) => {
                         if (!res) return;
-                        if (res.returnCode != 200) {
-                            eventBus.emit("error", JSON.stringify({ title: title, msg: res.returnMsg }));
-                            return;
-                        }
 
                         try {
                             //console.log(res);
@@ -510,6 +506,8 @@ class IframeWindow {
 
         // 滑鼠按下
         function onMouseDown(event) {
+            event.preventDefault();
+            if (that.currentWindow.classList.contains("fillWindow")) return;
             calc(event);
 
             const isResizing = onRightEdge || onBottomEdge || onTopEdge || onLeftEdge;
@@ -545,8 +543,6 @@ class IframeWindow {
                 iframe.classList.add("dragging");
                 that.navSticky();
             }
-
-            event.preventDefault();
         }
 
         // 滑鼠移動

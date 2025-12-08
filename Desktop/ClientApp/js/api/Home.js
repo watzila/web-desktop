@@ -29,11 +29,11 @@
             temperature: "0°C"
         };
 
-        await fetch(`https://opendata.cwa.gov.tw/api/v1/rest/datastore/${data.locationId}?Authorization=CWB-422B0FA3-E374-492D-B54A-4D8942BE2B7E&format=JSON&LocationName=${data.locationName}`)
-            .then(response => response.json())
-            .then(res => {
-                //console.log(res);
-                try {
+        try {
+            await fetch(`https://opendata.cwa.gov.tw/api/v1/rest/datastore/${data.locationId}?Authorization=CWB-422B0FA3-E374-492D-B54A-4D8942BE2B7E&format=JSON&LocationName=${data.locationName}`)
+                .then(response => response.json())
+                .then(res => {
+                    //console.log(res);
                     const locationInfo = res.records.Locations[0].Location[0];
                     if (locationInfo) {
                         result.temperature = locationInfo.WeatherElement.filter(a => a.ElementName == "平均溫度")[0].Time[0].ElementValue[0].Temperature + "°C";
@@ -69,10 +69,10 @@
                                 break;
                         }
                     }
-                } catch {
-                    throw new Error(JSON.stringify({ title: "天氣", msg: "✖讀取失敗" }));
-                }
-            });
+                });
+        } catch {
+            throw new Error(JSON.stringify({ title: "天氣", msg: "✖讀取失敗" }));
+        }
 
         return {
             returnCode: 200,

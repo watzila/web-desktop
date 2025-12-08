@@ -64,7 +64,7 @@ class Twse extends BaseComponent {
         if (!stockInfo) return;
 
         // 更新股票代碼
-        this.iframe.querySelector(".stock-code").textContent = stockInfo.stockId;
+        this.iframe.querySelector(".stock-code").textContent = stockInfo.title;
 
         const priceItems = this.iframe.querySelectorAll(".price-item");
 

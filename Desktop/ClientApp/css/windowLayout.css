@@ -178,23 +178,24 @@ textarea {
   display: block;
 }
 
-.menu-item .dropdown {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  min-width: 100px;
-  background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ccc;
-}
+        .menu-item .dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: max-content;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ccc;
+        }
 
-.menu-item .dropdown li button {
-  display: block;
-  width: 100%;
-  padding: 5px 10px;
-  text-align: start;
-}
+            .menu-item .dropdown li button {
+                display: block;
+                width: 100%;
+                padding: 5px 10px;
+                text-align: start;
+                font-size: 0.9rem;
+            }
 
 .menu-item .dropdown li button:hover {
   background-color: #eee;

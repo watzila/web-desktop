@@ -7,7 +7,13 @@ export default {
             returnCode: 200,
             returnMsg: "success",
             returnData: data[0],
-            js: "table"
+            js: "text"
         };
+    },
+    "/api/File/SaveText": async (ctx, data) => {
+        const db = await ctx.getDBInstance();
+        data = ctx.formDataToObj(data);
+
+        await ctx.updateStore(db, "Files", data, data.id);
     }
 };
