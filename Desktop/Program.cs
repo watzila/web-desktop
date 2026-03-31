@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen(c => {
     var jwtSecurityScheme = new OpenApiSecurityScheme {
         Scheme = "Bearer",
         BearerFormat = "JWT",
-        Description = "¤@¶}©l¤£¥²¿é¤JBearer¡Aª½±µ¿é¤Jtoken§Y¥i",
+        Description = "ä¸€é–‹å§‹ä¸å¿…è¼¸å…¥Bearerï¼Œç›´æ¥è¼¸å…¥tokenå³å¯",
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
         In = ParameterLocation.Header,
@@ -30,7 +30,7 @@ builder.Services.AddSwaggerGen(c => {
     c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
     c.AddSecurityRequirement(new OpenApiSecurityRequirement { { jwtSecurityScheme, Array.Empty<string>() } });
 
-    // Åª¨ú XML ÀÉ®×²£¥Í API »¡©ú
+    // è®€å– XML æª”æ¡ˆç”¢ç”Ÿ API èªªæ˜
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
