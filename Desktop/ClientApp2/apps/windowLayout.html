@@ -1,0 +1,16 @@
+﻿<div class="defaultWindow" data-class="{{ js}}" style="--w:{{#if w}}{{w}}{{#else}}900{{/if}};--h:{{#if h}}{{h}}{{#else}}600{{/if}}">
+    <header>
+        <div class="windowIcon">
+            <img src="{{iconPath}}" data-icon="img">
+        </div>
+        <div class="title">
+            <h4>{{title}}</h4>
+        </div>
+        <aside>
+            <button class="icon" title="最小化" data-action="minimize"><b>&#128469;</b></button>
+            <button class="icon" title="縮放" data-action="maximize"><b>&#128470;</b></button>
+            <button class="icon" title="關閉" data-action="close"><b>&#128473;</b></button>
+        </aside>
+    </header>
+    <main class="iframe"></main>
+</div>

@@ -1,0 +1,76 @@
+﻿<section class="appLayout wrap music">
+    <nav class="nav"></nav>
+
+    <div class="mainArea">
+        <div class="content">
+            <div class="displayWrap">
+                <div class="yt" style="display: none;"></div>
+                <div class="ytVideoIMG"><img src="images/YTVideo.jpg" title="" /></div>
+
+                <div class="playlistPanel closed" id="playlistPanel">
+                    <div class="header">
+                        <h3>播放列表</h3>
+                        <div class="playlistControls">
+                            <div class="dropdown">
+                                <button class="dropBTN" title="新增音樂"><i class="icofont-plus"></i> &ensp;新增音樂</button>
+                                <div class="dropdown-content">
+                                    <button id="addFileBTN" title="上傳檔案"><i class="icofont-folder-open"></i>&ensp;本機檔案</button>
+                                    <button id="addYouTubeBTN" title="輸入連結"><i class="icofont-link"></i>&ensp;輸入連結</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="playlist">
+                        {{#each data}}
+                        <li>
+                            <span data-id="{{id}}">{{name}}</span>
+                            <button class="removeMusicBTN" value="{{id}}" data-source="{{source}}"><b>&#128473;</b></button>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+            <div class="timeWrap">
+                <span class="currentTimeText">00:00:00</span>
+                <input type="range" min="0" max="0" value="0" class="timeSlider">
+                <span class="totalTimeText">00:00:00</span>
+            </div>
+            <div class="controlWrap">
+                <div class="videoTitle">
+                    <div>
+                        <h3></h3>
+                    </div>
+                </div>
+
+                <div class="middleWrap">
+                    <button class="prevBTN" title="上一首">⏮️</button>
+                    <button class="playBTN" title="播放">▶️</button>
+                    <button class="nextBTN" title="下一首">⏭️</button>
+                </div>
+
+                <div class="rightWrap">
+                    <div class="volumeControl">
+                        <button class="muteBTN" title="音量">🔊</button>
+                        <input type="range" min="0" max="100" class="volumeSlider">
+                    </div>
+                    <button class="icon" id="listBTN" title="清單"><i class="icofont-listing-box"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="addUrl" class="dialog-box">
+        <form method="dialog">
+            <h3>新增 YouTube 連結</h3>
+            <p>請貼上影片的網址：</p>
+            <input type="text" name="url" autocomplete="off" required />
+
+            <div class="dialog-actions">
+                <button type="button" class="closeBTN" onclick="this.closest('dialog').close()">取消</button>
+                <button id="addUrlBTN" class="confirmBTN">新增</button>
+            </div>
+        </form>
+    </dialog>
+
+</section>
